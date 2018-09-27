@@ -48,7 +48,8 @@ class SignInActivity : AppCompatActivity() {
     fun startNextActivity(user: FirebaseUser? = null){
         if(user != null){
             uploadUserInformation(user)
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, NavigationActivity::class.java))
+            finish()
         }
     }
 
