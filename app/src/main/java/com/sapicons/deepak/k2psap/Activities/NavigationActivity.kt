@@ -1,19 +1,26 @@
 package com.sapicons.deepak.k2psap.Activities
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.BottomNavigationView
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
+import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.sapicons.deepak.k2psap.Fragments.PostFragment
+import com.sapicons.deepak.k2psap.Others.UserLocation
 import com.sapicons.deepak.k2psap.R
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_navigation.*
@@ -24,6 +31,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     var auth: FirebaseAuth ?=null
     private var doubleBackToExit = false
+    lateinit var locationManager : LocationManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +51,11 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //set bottom navigation bar
         bottom_navigation_bar.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener)
 
-
         auth = FirebaseAuth.getInstance()
+
+        // check for Permissions
+        askForPermissions()
+
     }
 
     override fun onBackPressed() {
@@ -64,6 +75,9 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+
+
+    // setup UI (menus, bottom Nav bar, Side Nav bar)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.navigation, menu)
@@ -80,6 +94,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+
+    // side navigation bar
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
@@ -110,15 +126,18 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         return true
     }
 
+    // bottom navigation bar
+
     private val mOnBottomNavigationItemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener =
             BottomNavigationView.OnNavigationItemSelectedListener{ item ->
+                var fragment = PostFragment()
+                var fragTags =""
                 when(item.itemId){
                     R.id.bottom_navigation_home ->{
 
                     }
                     R.id.bottom_navigation_post ->{
-
-
+                        fragment = PostFragment()
                     }
                     R.id.bottom_navigation_favorites -> {
 
@@ -127,12 +146,18 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
 
                     }
+
                 }
+
+                var fragmentManager = fragmentManager
+                fragmentManager.beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,fragTags).commit()
 
                 true
             }
 
 
+
+    // handle user authentication data
     private fun signOutUser(){
         auth!!.signOut()
         AuthUI.getInstance()
@@ -149,6 +174,52 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         if(user == null){
             startActivity(Intent(this,SignInActivity::class.java))
             finish()
+        }
+    }
+
+
+
+    @SuppressLint("MissingPermission")
+    // get user location
+    fun getUserLocation(){
+
+        var userLocation = UserLocation(this)
+        locationManager = userLocation.locationManager
+
+        /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) run {
+
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                    1)
+        } else*/
+        Log.d("NA","LM: "+locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER))
+
+    }
+
+    private fun askForPermissions() {
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                1)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode){
+            1 ->{
+
+                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    // permission was granted
+
+                    // get the user's location
+                    getUserLocation()
+                }
+                else{
+                    // permission was denied
+                    Toasty.error(this,"Permission Denied").show()
+                    // set empty list view
+                }
+            }
+
         }
     }
 }
