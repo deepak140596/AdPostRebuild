@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sapicons.deepak.k2psap">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -29,8 +29,8 @@
             android:name=".Activities.NavigationActivity"
             android:label="@string/title_activity_navigation"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity" />
+        <activity android:name=".Activities.AdPreviewActivity" />
     </application>
 
 </manifest>

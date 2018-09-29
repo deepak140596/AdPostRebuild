@@ -1,11 +1,15 @@
 package com.sapicons.deepak.k2psap.Objects;
 
+import java.io.Serializable;
+
 /**
  * Created by Deepak Prasad on 26-09-2018.
  */
 
-public class UserItem {
+public class UserItem implements Serializable {
     String name, email, tokenId, phoneNumber, picUrl;
+
+    public UserItem(){}
 
     public UserItem(String name, String email, String tokenId, String phoneNumber, String picUrl){
         this.name = name;

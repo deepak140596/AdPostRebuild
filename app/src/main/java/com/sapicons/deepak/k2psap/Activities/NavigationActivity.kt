@@ -2,6 +2,7 @@ package com.sapicons.deepak.k2psap.Activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Fragment
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -19,6 +20,7 @@ import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.sapicons.deepak.k2psap.Fragments.ExploreFragment
 import com.sapicons.deepak.k2psap.Fragments.PostFragment
 import com.sapicons.deepak.k2psap.Others.UserLocation
 import com.sapicons.deepak.k2psap.R
@@ -51,10 +53,15 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //set bottom navigation bar
         bottom_navigation_bar.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener)
 
+
+
         auth = FirebaseAuth.getInstance()
 
         // check for Permissions
         askForPermissions()
+
+        //start explore fragment
+        startExploreFragment();
 
     }
 
@@ -130,10 +137,11 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private val mOnBottomNavigationItemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener =
             BottomNavigationView.OnNavigationItemSelectedListener{ item ->
-                var fragment = PostFragment()
+                var fragment : Fragment? = ExploreFragment()
                 var fragTags =""
                 when(item.itemId){
                     R.id.bottom_navigation_home ->{
+                        fragment = ExploreFragment()
 
                     }
                     R.id.bottom_navigation_post ->{
@@ -156,6 +164,12 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
 
 
+    private fun startExploreFragment(){
+        var fragment = ExploreFragment()
+        var fragmentManager = fragmentManager
+        fragmentManager.beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,"").commit()
+
+    }
 
     // handle user authentication data
     private fun signOutUser(){
