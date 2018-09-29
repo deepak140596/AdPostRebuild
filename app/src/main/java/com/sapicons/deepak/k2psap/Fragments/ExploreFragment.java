@@ -1,11 +1,14 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
+import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -24,31 +27,38 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
+import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Others.RecyclerViewTouchListener;
 import com.sapicons.deepak.k2psap.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
+
 /**
  * Created by Deepak Prasad on 29-09-2018.
  */
 
-public class ExploreFragment extends ListFragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener  {
+public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener  {
 
-    ListView adListView;
+    //ListView adListView;
+    RecyclerView adRecyclerView;
     ViewPager mostRecentViewPager;
     List<PostItem> postList;
-    AdPostAdapter postItemAdapter;
+    //AdPostAdapter postItemAdapter;
+    RecyclerView.Adapter postItemRAdapter;
+    RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_explore,container,false);
-        adListView = view.findViewById(R.id.frag_explore_ads_list_view);
+        //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
         mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
         context = getActivity();
 
@@ -58,17 +68,41 @@ public class ExploreFragment extends ListFragment implements SearchView.OnQueryT
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        initialiseViews();
+        initialiseViews(view);
         listenToChanges();
     }
 
-    public void initialiseViews(){
+    public void initialiseViews(View view){
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
-        adListView.setAdapter(postItemAdapter);
+        //postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
+        //adListView.setAdapter(postItemAdapter);
+
+        adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
+        mLayoutManager = new LinearLayoutManager(context);
+        adRecyclerView.setLayoutManager(mLayoutManager);
+
+        postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
+        adRecyclerView.setAdapter(postItemRAdapter);
+
+        adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
+                , adRecyclerView, new RecyclerViewTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                PostItem postItem = postList.get(position);
+                Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
+                //Bundle bundle =
+                intent.putExtra("selected_post_item",postItem);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
 
-        adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
@@ -77,7 +111,7 @@ public class ExploreFragment extends ListFragment implements SearchView.OnQueryT
                 intent.putExtra("selected_post_item",item);
                 startActivity(intent);
             }
-        });
+        });*/
     }
 
     public void listenToChanges(){
@@ -104,10 +138,10 @@ public class ExploreFragment extends ListFragment implements SearchView.OnQueryT
 
                         }
                         postList = new_list;
-                        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
-                        postItemAdapter.notifyDataSetChanged();
-                        adListView.setAdapter(postItemAdapter);
+                        postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
+                        adRecyclerView.setAdapter(postItemRAdapter);
 
+                        //postItemRAdapter.notifyDataSetChanged();
                         setUpViewPager();
                         //progressDialog.dismiss();
 
