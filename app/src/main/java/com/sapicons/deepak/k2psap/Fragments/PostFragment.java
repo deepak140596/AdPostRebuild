@@ -382,7 +382,7 @@ public class PostFragment extends Fragment {
         for(Uri uri: list){
 
             if(uri != null){
-                imageUploadCount++;
+
                 final StorageReference newRef = storageReference.child(uri.getLastPathSegment());
                 UploadTask task = newRef.putFile(uri);
 
@@ -402,7 +402,9 @@ public class PostFragment extends Fragment {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
                             Log.d("PIC_URL","url: "+downloadUri);
+                            imageUploadCount++;
                             setImageDownloadUrl(imageUploadCount,downloadUri);
+
                             if(imageUploadCount==list.size())
                                 //Toasty.success(getActivity(),"Images Uploaded").show();
                                 uploadPostToDatabase();
@@ -439,7 +441,7 @@ public class PostFragment extends Fragment {
                 description = descriptionEt.getText().toString(),
                 price = priceEt.getText().toString();
         int category = categoryId;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         float latitude = sharedPreferences.getFloat("latitude",0.0f);
         float longitude = sharedPreferences.getFloat("longitude",0.0f);
 
@@ -476,22 +478,35 @@ public class PostFragment extends Fragment {
 
     private void clearUI(){
         progressDialog.dismiss();
-        //Fragment fragment = new ExploreFragment();
-        //getActivity().getFragmentManager().beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,"").commit();
-        //set edit text as empty
-        adTitleEt.setText("");
-        descriptionEt.setText("");
-        priceEt.setText("");
 
-        imgOneUri = null;imgTwoUri = null; imgThreeUri=null; imgFourUri=null; imgFiveUri=null;
-        categoryId =0;
-        imgOneUrl=""; imgTwoUrl="";imgThreeUrl="";imgFourUrl="";imgFiveUrl="";
+        //if(imageUploadCount==list.size()) {
 
-        imgClicked=0;
-        imageUploadCount =0;
-        list=null;
+            //set edit text as empty
+            adTitleEt.setText("");
+            descriptionEt.setText("");
+            priceEt.setText("");
 
-        setUpViewPager();
-        emptyViewPagerIv.setVisibility(View.VISIBLE);
+            imgOneUri = null;
+            imgTwoUri = null;
+            imgThreeUri = null;
+            imgFourUri = null;
+            imgFiveUri = null;
+            categoryId = 0;
+            imgOneUrl = "";
+            imgTwoUrl = "";
+            imgThreeUrl = "";
+            imgFourUrl = "";
+            imgFiveUrl = "";
+
+            imgClicked = 0;
+            imageUploadCount = 0;
+            list = null;
+
+            setUpViewPager();
+            emptyViewPagerIv.setVisibility(View.VISIBLE);
+
+            Fragment fragment = new ExploreFragment();
+            getActivity().getFragmentManager().beginTransaction().replace(R.id.navigation_activity_content_frame, fragment, "").commit();
+        //}
     }
 }

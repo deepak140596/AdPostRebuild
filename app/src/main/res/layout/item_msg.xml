@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/item_msg_received_background"
+        android:text="Received Text"
+        android:padding="8dp"
+        android:id="@+id/item_msg_received_tv"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:background="@drawable/item_msg_sent_background"
+        android:text="Sent Text"
+        android:textColor="#000000"
+        android:padding="8dp"
+        android:id="@+id/item_msg_sent_tv"/>
+
+</RelativeLayout>

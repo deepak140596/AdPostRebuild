@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    tools:context="com.sapicons.deepak.k2psap.Activities.ChatActivity">
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/activity_chat_text_compose_rl"
+        android:stackFromBottom="true"
+        android:id="@+id/chat_activity_listview"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/activity_chat_text_compose_rl">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_toLeftOf="@+id/chat_activity_send_btn"
+            android:background="@drawable/item_msg_received_background"
+            android:id="@+id/chat_activity_compose_text_et"
+            android:hint="Type a message"/>
+
+        <mehdi.sakout.fancybuttons.FancyButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="16dp"
+            android:id="@+id/chat_activity_send_btn"
+            fancy:fb_radius="40dp"
+            fancy:fb_text=""
+            fancy:fb_iconResource="@drawable/ic_menu_send"
+            fancy:fb_iconPaddingTop="12dp"
+            fancy:fb_iconPaddingLeft="8dp"
+            fancy:fb_focusColor="#5577bd"
+            fancy:fb_defaultColor="#b5e4d5"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

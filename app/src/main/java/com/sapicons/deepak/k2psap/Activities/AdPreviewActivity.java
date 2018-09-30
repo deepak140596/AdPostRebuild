@@ -1,7 +1,9 @@
 package com.sapicons.deepak.k2psap.Activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,15 +14,23 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
+import com.sapicons.deepak.k2psap.Objects.ChatItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.R;
 
@@ -108,6 +118,14 @@ public class AdPreviewActivity extends AppCompatActivity {
         // setup set favorites feature
 
         // setup contact
+        // setup chat
+        messageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showProgressDialog("Please Wait ...");
+                getPreviousChatHistory();
+            }
+        });
 
 
 
@@ -167,6 +185,65 @@ public class AdPreviewActivity extends AppCompatActivity {
     public void setUpDate(){
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMMM");
         datePostedTv.setText(dateFormatter.format(Long.parseLong(postItem.getPostId())));
+    }
+
+    public void getPreviousChatHistory(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference chatRef = db.collection("chats");
+        Query query = chatRef.whereEqualTo("userIdOne",user.getEmail())
+                .whereEqualTo("userIdTwo",postItem.getEmailId())
+                .whereEqualTo("postId",postItem.getPostId());
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                if(task.isSuccessful()){
+                    if(task.getResult().size()>0){
+                        for(QueryDocumentSnapshot doc: task.getResult()){
+                            Log.d("AD_PREV", doc.getId() + " => " + doc.getData());
+                            ChatItem chatItem = doc.toObject(ChatItem.class);
+                            startChatActivity(chatItem);
+                        }
+                    }else{
+                        Log.d("AD_PREV","No Previous Chats!");
+                        ChatItem chatItem = new ChatItem(Calendar.getInstance().getTimeInMillis()+"",
+                                user.getEmail(),postItem.getEmailId(),
+                                postItem.getPostId());
+                        createNewChatRoom(chatItem);
+                        //startChatActivity(chatItem);
+                    }
+                }else{
+                    Log.d("AD_PREV","Error getting chats. "+task.getException());
+                }
+            }
+        });
+    }
+
+    public void createNewChatRoom(final ChatItem chatItem){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference chatRef = db.collection("chats").document(chatItem.getChatId());
+        chatRef.set(chatItem).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("AD_PREV","Successfully created a new chatroom.");
+                startChatActivity(chatItem);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("AD_PREV","Error creating a new chatroom.  "+e);
+            }
+        });
+
+    }
+
+    public void startChatActivity(ChatItem chatItem){
+        Intent intent=new Intent(AdPreviewActivity.this,ChatActivity.class);
+        intent.putExtra("selected_chat",chatItem);
+        progressDialog.dismiss();
+        startActivity(intent);
+
     }
 
 }

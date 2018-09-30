@@ -121,7 +121,7 @@
                 android:orientation="horizontal"
                 android:id="@+id/ad_preview_contact_ll"
                 android:layout_margin="16dp"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <mehdi.sakout.fancybuttons.FancyButton
                     android:layout_width="110dp"

@@ -86,7 +86,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
+        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
         adListView.setAdapter(postItemAdapter);
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
@@ -143,7 +143,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                         }
                         postList = new_list;
-                        postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
+                        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
                         adListView.setAdapter(postItemAdapter);
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);
