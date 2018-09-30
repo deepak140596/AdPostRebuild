@@ -45,13 +45,13 @@ import es.dmoral.toasty.Toasty;
 
 public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener  {
 
-    //ListView adListView;
-    RecyclerView adRecyclerView;
+    ListView adListView;
+    //RecyclerView adRecyclerView;
     ViewPager mostRecentViewPager;
     List<PostItem> postList;
-    //AdPostAdapter postItemAdapter;
-    RecyclerView.Adapter postItemRAdapter;
-    RecyclerView.LayoutManager mLayoutManager;
+    AdPostAdapter postItemAdapter;
+    //RecyclerView.Adapter postItemRAdapter;
+    //RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
     @Override
@@ -59,9 +59,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         View view = inflater.inflate(R.layout.fragment_explore,container,false);
         //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
-        mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
-        context = getActivity();
 
+        context = getActivity();
         return view;
     }
 
@@ -73,18 +72,24 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     public void initialiseViews(View view){
+
+
+        adListView =view.findViewById(R.id.frag_explore_ads_list_view);
+        //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
+        mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
+
+        //mLayoutManager = new LinearLayoutManager(context);
+        //adRecyclerView.setLayoutManager(mLayoutManager);
+
+        //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
+        //adRecyclerView.setAdapter(postItemRAdapter);
+
+
         postList = new ArrayList<>();
-        //postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
-        //adListView.setAdapter(postItemAdapter);
+        postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
+        adListView.setAdapter(postItemAdapter);
 
-        adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
-        mLayoutManager = new LinearLayoutManager(context);
-        adRecyclerView.setLayoutManager(mLayoutManager);
-
-        postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
-        adRecyclerView.setAdapter(postItemRAdapter);
-
-        adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
+        /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
                 , adRecyclerView, new RecyclerViewTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -99,10 +104,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             public void onLongClick(View view, int position) {
 
             }
-        }));
+        }));*/
 
 
-        /*adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
@@ -111,7 +116,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 intent.putExtra("selected_post_item",item);
                 startActivity(intent);
             }
-        });*/
+        });
     }
 
     public void listenToChanges(){
@@ -138,8 +143,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                         }
                         postList = new_list;
-                        postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
-                        adRecyclerView.setAdapter(postItemRAdapter);
+                        postItemAdapter = new AdPostAdapter(getActivity(),R.layout.item_ad_post,postList);
+                        adListView.setAdapter(postItemAdapter);
+                        //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
+                        //adRecyclerView.setAdapter(postItemRAdapter);
 
                         //postItemRAdapter.notifyDataSetChanged();
                         setUpViewPager();

@@ -30,7 +30,7 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_centerInParent="true"
-                    android:src="@mipmap/ic_add_post"
+                    android:src="@mipmap/ic_android_icon"
                     android:id="@+id/ad_preview_empty_view_pager_iv"/>
             </RelativeLayout>
 
@@ -119,7 +119,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_margin="16dp">
+                android:id="@+id/ad_preview_contact_ll"
+                android:layout_margin="16dp"
+                android:visibility="gone">
 
                 <mehdi.sakout.fancybuttons.FancyButton
                     android:layout_width="110dp"
@@ -144,6 +146,27 @@
                     fancy:fb_focusColor="#5577bd"
                     fancy:fb_defaultColor="#b5e4d5"/>
             </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/ad_preview_close_post_rl"
+            android:layout_margin="16dp"
+            android:visibility="gone">
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:id="@+id/ad_preview_close_btn"
+                fancy:fb_text="Close Ad"
+                fancy:fb_textColor="#000000"
+                fancy:fb_radius="10dp"
+                fancy:fb_iconResource="@mipmap/ic_close_icon"
+                fancy:fb_focusColor="#5577bd"
+                fancy:fb_defaultColor="#b5e4d5"/>
+        </RelativeLayout>
 
 
     </LinearLayout>

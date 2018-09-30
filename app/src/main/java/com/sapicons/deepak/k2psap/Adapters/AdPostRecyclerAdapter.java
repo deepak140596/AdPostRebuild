@@ -1,6 +1,7 @@
 package com.sapicons.deepak.k2psap.Adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,16 +30,20 @@ public class AdPostRecyclerAdapter extends RecyclerView.Adapter<AdPostRecyclerAd
     public class AdPostViewHolder extends  RecyclerView.ViewHolder{
         public TextView titleTv, descriptionTv, priceTv;
         public ImageView coverIv;
-        public MaterialFavoriteButton favButton;
+
+        public boolean isFavorited = false;
+
+        //public MaterialFavoriteButton favButton;
         //int position;
 
         AdPostViewHolder(View view){
             super(view);
             titleTv = view.findViewById(R.id.item_ad_post_title_tv);
-            favButton = view.findViewById(R.id.item_ad_post_fav);
+            //favButton = view.findViewById(R.id.item_ad_post_fav);
             descriptionTv = view.findViewById(R.id.item_ad_post_description_tv);
             priceTv = view.findViewById(R.id.item_ad_post_price_tv);
             coverIv = view.findViewById(R.id.item_ad_post_imageview);
+
         }
     }
 
@@ -61,12 +66,19 @@ public class AdPostRecyclerAdapter extends RecyclerView.Adapter<AdPostRecyclerAd
     public void onBindViewHolder(@NonNull AdPostViewHolder holder, int position) {
 
         PostItem postItem = postList.get(position);
+
         holder.titleTv.setText(postItem.getTitle());
         holder.descriptionTv.setText(postItem.getDescription());
         holder.priceTv.setText(postItem.getPrice());
 
         if(!postItem.getImgUrlOne().isEmpty())
             Glide.with(context).load(postItem.getImgUrlOne()).into(holder.coverIv);
+        else
+            holder.coverIv.setImageResource(R.mipmap.ic_android_icon);
+
+
+
+
 
     }
 

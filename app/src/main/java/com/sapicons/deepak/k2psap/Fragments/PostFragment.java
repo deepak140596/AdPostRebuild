@@ -476,10 +476,10 @@ public class PostFragment extends Fragment {
 
     private void clearUI(){
         progressDialog.dismiss();
-        Fragment fragment = new ExploreFragment();
-        getActivity().getFragmentManager().beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,"").commit();
+        //Fragment fragment = new ExploreFragment();
+        //getActivity().getFragmentManager().beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,"").commit();
         //set edit text as empty
-        /*adTitleEt.setText("");
+        adTitleEt.setText("");
         descriptionEt.setText("");
         priceEt.setText("");
 
@@ -492,6 +492,6 @@ public class PostFragment extends Fragment {
         list=null;
 
         setUpViewPager();
-        emptyViewPagerIv.setVisibility(View.VISIBLE);*/
+        emptyViewPagerIv.setVisibility(View.VISIBLE);
     }
 }

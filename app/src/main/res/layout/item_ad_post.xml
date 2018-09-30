@@ -17,11 +17,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.github.ivbaranov.mfb.MaterialFavoriteButton
+            <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_margin="8dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
+                android:src="@drawable/ic_star_black_24dp"
+                android:id="@+id/item_ad_post_unfav"
+                android:visibility="gone"/>
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/ic_star_border_black_24dp"
                 android:id="@+id/item_ad_post_fav"/>
 
             <LinearLayout

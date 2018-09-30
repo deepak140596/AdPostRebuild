@@ -14,6 +14,8 @@ import com.bumptech.glide.Glide;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
@@ -54,6 +56,10 @@ public class AdPostViewPagerAdapter extends PagerAdapter {
         title.setText(postItem.getTitle());
         price.setText(postItem.getPrice());
 
+        //set up date
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMMM");
+        date.setText(dateFormatter.format(Long.parseLong(postItem.getPostId())));
+
 
 
         container.addView(view);
@@ -81,4 +87,5 @@ public class AdPostViewPagerAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
     }
+
 }

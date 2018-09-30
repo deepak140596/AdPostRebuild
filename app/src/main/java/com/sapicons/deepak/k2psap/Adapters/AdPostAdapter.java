@@ -42,7 +42,9 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
     static class ViewHolder{
 
         TextView titleTv, descriptionTv, priceTv;
-        ImageView coverIv,favButton;
+        ImageView coverIv;
+        boolean isFavorited=false;
+        ImageView favButton,unfavButton;
         int position;
     }
 
@@ -58,6 +60,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             holder = new ViewHolder();
             holder.titleTv = convertView.findViewById(R.id.item_ad_post_title_tv);
             holder.favButton = convertView.findViewById(R.id.item_ad_post_fav);
+            holder.unfavButton = convertView.findViewById(R.id.item_ad_post_unfav);
             holder.descriptionTv = convertView.findViewById(R.id.item_ad_post_description_tv);
             holder.priceTv = convertView.findViewById(R.id.item_ad_post_price_tv);
             holder.coverIv = convertView.findViewById(R.id.item_ad_post_imageview);
@@ -73,7 +76,6 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         }
 
         PostItem postItem =getItem(position);
-        //MaterialFavoriteButton favoriteButton = convertView.findViewById(R.id.item_ad_post_fav);
 
         holder.titleTv.setText(postItem.getTitle());
         holder.descriptionTv.setText(postItem.getDescription());
@@ -81,18 +83,39 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
         if(!postItem.getImgUrlOne().isEmpty())
             Glide.with(context).load(postItem.getImgUrlOne()).into(holder.coverIv);
+        else
+            holder.coverIv.setImageResource(R.mipmap.ic_android_icon);
 
-        //set favorite button
-        holder.favButton.setOnClickListener(new View.OnClickListener() {
+        /*if(holder.isFavorited) {
+            holder.unfavButton.setVisibility(View.VISIBLE);
+            holder.favButton.setVisibility(View.GONE);
+        }
+        else{
+            holder.favButton.setVisibility(View.VISIBLE);
+            holder.unfavButton.setVisibility(View.GONE);
+        }
+
+       holder.favButton.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               holder.isFavorited = true;
+               holder.favButton.setVisibility(View.GONE);
+               holder.unfavButton.setVisibility(View.VISIBLE);
+
+               //add post to favorite list
+           }
+       });
+
+        holder.unfavButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.favButton.setBackgroundResource(R.drawable.ic_star_black_24dp);
+                holder.isFavorited = false;
+                holder.unfavButton.setVisibility(View.GONE);
+                holder.favButton.setVisibility(View.VISIBLE);
 
-                notifyDataSetChanged();
+                //remove post from favorite list
             }
-        });
-
-        holder.favButton.setTag(postItem);
+        });*/
 
         return  convertView;
     }
