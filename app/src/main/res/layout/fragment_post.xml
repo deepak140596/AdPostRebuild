@@ -109,6 +109,7 @@
                         android:layout_height="match_parent"
                         android:id="@+id/post_price_et"
                         android:textSize="14sp"
+                        android:inputType="number"
                         android:hint="Price"/>
                 </android.support.design.widget.TextInputLayout>
 

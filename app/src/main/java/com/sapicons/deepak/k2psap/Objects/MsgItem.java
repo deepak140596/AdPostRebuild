@@ -6,14 +6,14 @@ import java.io.Serializable;
  * Created by Deepak Prasad on 30-09-2018.
  */
 
-public class ChatMsgItem implements Serializable {
+public class MsgItem implements Serializable {
     String to;
     String from;
     String msgId;
     String msg;
-    public ChatMsgItem(){}
+    public MsgItem(){}
 
-    public ChatMsgItem(String msgId, String to, String from,String msg){
+    public MsgItem(String msgId, String to, String from, String msg){
         this.msgId = msgId;
         this.from = from;
         this.to = to;

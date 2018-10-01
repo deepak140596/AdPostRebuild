@@ -20,6 +20,7 @@ import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.sapicons.deepak.k2psap.Fragments.ChatsFragment
 import com.sapicons.deepak.k2psap.Fragments.ExploreFragment
 import com.sapicons.deepak.k2psap.Fragments.PostFragment
 import com.sapicons.deepak.k2psap.Others.UserLocation
@@ -149,9 +150,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     }
                     R.id.bottom_navigation_favorites -> {
 
+
                     }
                     R.id.bottom_navigation_chat -> {
-
+                        fragment = ChatsFragment()
 
                     }
 

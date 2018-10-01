@@ -21,9 +21,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.sapicons.deepak.k2psap.Adapters.ChatMsgAdapter;
+import com.sapicons.deepak.k2psap.Adapters.MsgItemAdapter;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
-import com.sapicons.deepak.k2psap.Objects.ChatMsgItem;
+import com.sapicons.deepak.k2psap.Objects.MsgItem;
 import com.sapicons.deepak.k2psap.R;
 
 import java.util.ArrayList;
@@ -42,8 +42,8 @@ public class ChatActivity extends AppCompatActivity {
     FirebaseUser user;
 
     ChatItem chatItem;
-    List<ChatMsgItem> list;
-    ChatMsgAdapter adapter;
+    List<MsgItem> list;
+    MsgItemAdapter adapter;
 
 
 
@@ -52,7 +52,10 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+
         chatItem = (ChatItem)getIntent().getSerializableExtra("selected_chat");
+        String userName = getIntent().getStringExtra("user_name");
+        setTitle(userName);
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         initialiseViews();
@@ -60,13 +63,15 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void initialiseViews(){
+
+
         listView = findViewById(R.id.chat_activity_listview);
         composeText = findViewById(R.id.chat_activity_compose_text_et);
         sendBtn = findViewById(R.id.chat_activity_send_btn);
         sendBtn.setEnabled(false);
 
         list = new ArrayList<>();
-        adapter = new ChatMsgAdapter(this,R.layout.item_msg,list);
+        adapter = new MsgItemAdapter(this,R.layout.item_msg,list);
         listView.setAdapter(adapter);
 
         // send btn is disabled for empty text
@@ -98,6 +103,7 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                composeText.setText("");
                 addMessageToDatabase();
             }
         });
@@ -108,11 +114,11 @@ public class ChatActivity extends AppCompatActivity {
 
     public void addMessageToDatabase(){
         String msg = composeText.getText().toString();
-        String msgId = Calendar.getInstance().getTimeInMillis()+"";
+        final String msgId = Calendar.getInstance().getTimeInMillis()+"";
         String from = user.getEmail();
         String to = (from.equals(chatItem.getUserIdOne())) ? chatItem.getUserIdTwo() : chatItem.getUserIdOne();
 
-        ChatMsgItem newMsg = new ChatMsgItem(msgId,to,from,msg);
+        MsgItem newMsg = new MsgItem(msgId,to,from,msg);
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -123,7 +129,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG,"Successfully added message.");
-                composeText.setText("");
+                addLatestTimestampInChats(msgId);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -133,6 +139,19 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void addLatestTimestampInChats(String msgId){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = db.collection("chats").document(chatItem.getChatId());
+        documentReference.update("lastMsgTimestamp",Long.parseLong(msgId))
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG,"Error updating lastMsgTimeStamp: "+e);
+                    }
+                });
+    }
+
 
     public void fetchMessagesFromDatabase(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -147,14 +166,14 @@ public class ChatActivity extends AppCompatActivity {
                     return;
                 }
 
-                List<ChatMsgItem> newlist = new ArrayList<>();
+                List<MsgItem> newlist = new ArrayList<>();
                 for(QueryDocumentSnapshot doc: queryDocumentSnapshots){
                     Log.d(TAG,"MSG_ITEM: "+doc);
-                    ChatMsgItem item=doc.toObject(ChatMsgItem.class);
+                    MsgItem item=doc.toObject(MsgItem.class);
                     newlist.add(item);
                 }
                 list = newlist;
-                adapter = new ChatMsgAdapter(ChatActivity.this,R.layout.item_msg,list);
+                adapter = new MsgItemAdapter(ChatActivity.this,R.layout.item_msg,list);
                 listView.setAdapter(adapter);
             }
         });

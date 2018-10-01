@@ -56,6 +56,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getActivity().setTitle("Nearby ");
 
         View view = inflater.inflate(R.layout.fragment_explore,container,false);
         //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
