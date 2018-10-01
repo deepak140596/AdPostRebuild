@@ -31,7 +31,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity" />
         <activity android:name=".Activities.AdPreviewActivity" />
-        <activity android:name=".Activities.ChatActivity"></activity>
+        <activity android:name=".Activities.ChatActivity" />
+        <activity android:name=".Activities.PhoneAuthActivity"></activity>
     </application>
 
 </manifest>

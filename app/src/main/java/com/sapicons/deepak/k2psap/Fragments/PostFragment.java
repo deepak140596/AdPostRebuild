@@ -14,7 +14,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,8 +35,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -54,6 +63,10 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 
 import es.dmoral.toasty.Toasty;
 
@@ -72,10 +85,12 @@ public class PostFragment extends Fragment {
     Spinner categorySpinner;
     ProgressDialog progressDialog;
     EditText adTitleEt, descriptionEt, priceEt;
+    SwitchCompat sharePhoneNumberSwitch;
 
     Uri imgOneUri, imgTwoUri, imgThreeUri, imgFourUri, imgFiveUri;
     int categoryId ;
     String imgOneUrl="", imgTwoUrl="",imgThreeUrl="",imgFourUrl="",imgFiveUrl="";
+    String confirmedPhoneNumber = "";
 
     int imgClicked=0;
     int imageUploadCount =0;
@@ -84,6 +99,10 @@ public class PostFragment extends Fragment {
 
     Context context;
 
+    String TAG ="POST_FRAG";
+
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     @Nullable
     @Override
@@ -119,6 +138,8 @@ public class PostFragment extends Fragment {
         doneBtn = view.findViewById(R.id.post_done_fab);
         viewPager= view.findViewById(R.id.post_preview_images_viewpager);
         categorySpinner = view.findViewById(R.id.post_category_spinner);
+        sharePhoneNumberSwitch = view.findViewById(R.id.post_share_phone_switch);
+
 
         list = new ArrayList<>();
 
@@ -126,6 +147,11 @@ public class PostFragment extends Fragment {
         setTextWatchers();
 
         setOnClickListeners();
+
+        initialiseMCallbacks();
+
+        // set switch listener
+
 
 
     }
@@ -188,9 +214,18 @@ public class PostFragment extends Fragment {
         doneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showProgressDialog("Posting Ad. Please Wait ...");
 
-                askForConfirmationToUploadAd();
+                // check if user has verified his phone number, if not, verify it
+                // only when user opts to share his phone number;
+                if(sharePhoneNumberSwitch.isChecked()){
+                    if(user.getPhoneNumber().isEmpty())
+                        showDialogToEnterPhoneNumber();
+                    else
+                        askForConfirmationToUploadAd();
+                        //linkPhoneAuthWithCurrentAuth();
+                }
+                else
+                    askForConfirmationToUploadAd();
             }
         });
     }
@@ -291,7 +326,7 @@ public class PostFragment extends Fragment {
             catName.add(item.getName());
 
         // Create a default adapter for spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,catName);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,catName);
 
         // Drop down layout style
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -355,6 +390,7 @@ public class PostFragment extends Fragment {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        showProgressDialog("Posting Ad. Please Wait ...");
                         postAd();
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -375,7 +411,7 @@ public class PostFragment extends Fragment {
     }
 
     public void uploadPics(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         storageReference = FirebaseStorage.getInstance().getReference().child("users").child(user.getEmail())
                 .child("posts");
 
@@ -432,14 +468,20 @@ public class PostFragment extends Fragment {
     }
 
     public void uploadPostToDatabase(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         String postId = Calendar.getInstance().getTimeInMillis()+"";
         String email = user.getEmail(),
-                phoneNumber = user.getPhoneNumber()+"",
                 title = adTitleEt.getText().toString(),
                 description = descriptionEt.getText().toString(),
                 price = priceEt.getText().toString();
+        String phoneNumber = "";
+
+        // share phone number only if user opts to
+        if(sharePhoneNumberSwitch.isChecked()){
+            phoneNumber = user.getPhoneNumber();
+        }
+
         int category = categoryId;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         float latitude = sharedPreferences.getFloat("latitude",0.0f);
@@ -508,5 +550,139 @@ public class PostFragment extends Fragment {
             Fragment fragment = new ExploreFragment();
             getActivity().getFragmentManager().beginTransaction().replace(R.id.navigation_activity_content_frame, fragment, "").commit();
         //}
+    }
+
+
+    public void showDialogToEnterPhoneNumber(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View view = layoutInflater.inflate(R.layout.custom_input,null);
+        builder.setView(view);
+
+        final EditText inputEt = view.findViewById(R.id.custom_input_et);
+        inputEt.setText("+91");
+        inputEt.setInputType(InputType.TYPE_CLASS_PHONE);
+
+        builder.setTitle("Enter Phone Number ");
+        builder.setPositiveButton("Send OTP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(!inputEt.getText().toString().isEmpty()){
+
+                    sendOTP(inputEt.getText().toString().trim());
+
+                }
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                sharePhoneNumberSwitch.setChecked(false);
+            }
+        });
+
+        builder.create().show();
+    }
+
+    public void sendOTP(String phoneNumber){
+        showProgressDialog("Please wait while we confirm your phone number.");
+        confirmedPhoneNumber = phoneNumber;
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,60, TimeUnit.SECONDS, getActivity(), mCallbacks);
+
+    }
+
+    public void initialiseMCallbacks(){
+        mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+            @Override
+            public void onVerificationCompleted(PhoneAuthCredential credential) {
+                // This callback will be invoked in two situations:
+                // 1 - Instant verification. In some cases the phone number can be instantly
+                //     verified without needing to send or enter a verification code.
+                // 2 - Auto-retrieval. On some devices Google Play services can automatically
+                //     detect the incoming verification SMS and perform verification without
+                //     user action.
+                Log.d(TAG, "onVerificationCompleted:" + credential);
+                Toasty.success(context,"Phone Verified!").show();
+
+                //progressDialog.dismiss();
+                linkPhoneAuthWithCurrentAuth(credential);
+            }
+
+            @Override
+            public void onVerificationFailed(FirebaseException e) {
+                // This callback is invoked in an invalid request for verification is made,
+                // for instance if the the phone number format is not valid.
+                Log.w(TAG, "onVerificationFailed", e);
+                progressDialog.dismiss();
+                //confirmedPhoneNumber = "";
+
+                if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                    // Invalid request
+                    // ...
+                    Toasty.error(context,"Invalid Phone Number. Try Again!").show();
+                    showDialogToEnterPhoneNumber();
+                } else if (e instanceof FirebaseTooManyRequestsException) {
+                    // The SMS quota for the project has been exceeded
+                    // ...
+                    Toasty.error(context,"Please try after some time!").show();
+                }
+
+                // Show a message and update the UI
+                // ...
+            }
+
+            @Override
+            public void onCodeSent(String verificationId,
+                                   PhoneAuthProvider.ForceResendingToken token) {
+                // The SMS verification code has been sent to the provided phone number, we
+                // now need to ask the user to enter the code and then construct a credential
+                // by combining the code with a verification ID.
+                Log.d(TAG, "onCodeSent:" + verificationId);
+
+                // Save verification ID and resending token so we can use them later
+                //VerificationId = verificationId;
+                //mResendToken = token;
+
+                // ...
+            }
+        };
+    }
+
+    public void linkPhoneAuthWithCurrentAuth(PhoneAuthCredential credential){
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.getCurrentUser().linkWithCredential(credential)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                        progressDialog.dismiss();
+
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "linkWithCredential:success");
+                            FirebaseUser user = task.getResult().getUser();
+                            updateUserPhoneNumberToDB();
+                            askForConfirmationToUploadAd();
+
+                        } else {
+                            Log.w(TAG, "linkWithCredential:failure", task.getException());
+                            Toasty.error(context, "Phone number already exists.").show();
+                            sharePhoneNumberSwitch.setChecked(false);
+                        }
+                    }
+                });
+
+
+    }
+
+    public void updateUserPhoneNumberToDB(){
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection("users").document(user.getEmail());
+        docRef.update("phoneNumber",user.getPhoneNumber()).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,"Error updating phone number to DB. "+e);
+            }
+        });
     }
 }

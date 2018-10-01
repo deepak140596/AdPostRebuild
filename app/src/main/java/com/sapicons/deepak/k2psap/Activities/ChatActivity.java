@@ -103,8 +103,9 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                addMessageToDatabase(composeText.getText().toString());
                 composeText.setText("");
-                addMessageToDatabase();
             }
         });
 
@@ -112,8 +113,8 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    public void addMessageToDatabase(){
-        String msg = composeText.getText().toString();
+    public void addMessageToDatabase(String msg){
+        //String msg = composeText.getText().toString();
         final String msgId = Calendar.getInstance().getTimeInMillis()+"";
         String from = user.getEmail();
         String to = (from.equals(chatItem.getUserIdOne())) ? chatItem.getUserIdTwo() : chatItem.getUserIdOne();
