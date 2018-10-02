@@ -127,6 +127,14 @@ public class AdPreviewActivity extends AppCompatActivity {
             }
         });
 
+        // call seller
+        callBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                callSeller();
+            }
+        });
+
 
 
 
@@ -241,9 +249,16 @@ public class AdPreviewActivity extends AppCompatActivity {
     public void startChatActivity(ChatItem chatItem){
         Intent intent=new Intent(AdPreviewActivity.this,ChatActivity.class);
         intent.putExtra("selected_chat",chatItem);
+        intent.putExtra("user_name","Send a message");
         progressDialog.dismiss();
         startActivity(intent);
 
+    }
+
+    public void callSeller(){
+        String phone = postItem.getPhoneNumber();
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel",phone,null));
+        startActivity(intent);
     }
 
 }

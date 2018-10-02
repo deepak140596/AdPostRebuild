@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -14,9 +15,19 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.R;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -25,6 +36,7 @@ import java.util.List;
 
 public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
+    String TAG = "AD_POST_ADAPTER";
     Context context;
     int layoutResourceId;
     List<PostItem> postItems;
@@ -51,7 +63,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         final ViewHolder holder;
         if(convertView == null){
@@ -75,7 +87,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
         }
 
-        PostItem postItem =getItem(position);
+        final PostItem postItem =getItem(position);
 
         holder.titleTv.setText(postItem.getTitle());
         holder.descriptionTv.setText(postItem.getDescription());
@@ -86,37 +98,108 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         else
             holder.coverIv.setImageResource(R.mipmap.ic_android_icon);
 
-        /*if(holder.isFavorited) {
-            holder.unfavButton.setVisibility(View.VISIBLE);
-            holder.favButton.setVisibility(View.GONE);
-        }
-        else{
-            holder.favButton.setVisibility(View.VISIBLE);
-            holder.unfavButton.setVisibility(View.GONE);
-        }
+
+
+        // set if the ad is favorited or not
+        setFavButton(holder,postItem);
 
        holder.favButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
-               holder.isFavorited = true;
-               holder.favButton.setVisibility(View.GONE);
-               holder.unfavButton.setVisibility(View.VISIBLE);
 
                //add post to favorite list
+               addPostToFavList(holder,postItem);
            }
        });
 
         holder.unfavButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.isFavorited = false;
-                holder.unfavButton.setVisibility(View.GONE);
-                holder.favButton.setVisibility(View.VISIBLE);
 
                 //remove post from favorite list
+                removePostFromFavList(holder,postItem);
             }
-        });*/
+        });
 
         return  convertView;
     }
+
+    public void setFavButton(final ViewHolder holder, PostItem postItem){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DocumentReference favRef = FirebaseFirestore.getInstance()
+                .collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds")
+                .document(postItem.getPostId());
+
+        favRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if(documentSnapshot.exists()){
+
+
+                        holder.favButton.setVisibility(View.GONE);
+                        holder.unfavButton.setVisibility(View.VISIBLE);
+                    }else{
+                        //no such doc exits
+                        Log.d(TAG,"No such doc exits!");
+                        holder.unfavButton.setVisibility(View.GONE);
+                        holder.favButton.setVisibility(View.VISIBLE);
+                    }
+                }else{
+                    Log.d(TAG,"Error getting document!");
+                }
+            }
+        });
+    }
+
+    public void addPostToFavList(final ViewHolder holder, final PostItem postItem){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DocumentReference favRef = FirebaseFirestore.getInstance()
+                .collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds")
+                .document(postItem.getPostId());
+
+        HashMap<String,Boolean> hashMap = new HashMap<>();
+        hashMap.put("isFav",true);
+
+
+        favRef.set(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG,"Ad Favorited!");
+                setFavButton(holder,postItem);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,"Failed to update favorites!   " + e);
+            }
+        });
+    }
+
+    public void removePostFromFavList(final ViewHolder holder,final PostItem postItem){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DocumentReference favRef = FirebaseFirestore.getInstance()
+                .collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds")
+                .document(postItem.getPostId());
+        favRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG,"Ad removed from fav List.");
+                setFavButton(holder,postItem);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,"Failed to remove ad from fav list.   "+e);
+            }
+        });
+    }
+
 }
