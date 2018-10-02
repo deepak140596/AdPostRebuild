@@ -24,11 +24,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.R;
 
 import java.util.HashMap;
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by Deepak Prasad on 29-09-2018.
@@ -163,14 +166,12 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
                 .collection("favoritedAds")
                 .document(postItem.getPostId());
 
-        HashMap<String,Boolean> hashMap = new HashMap<>();
-        hashMap.put("isFav",true);
 
-
-        favRef.set(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+        favRef.set(postItem).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG,"Ad Favorited!");
+                Toasty.info(context,"Added to Favorites!").show();
                 setFavButton(holder,postItem);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -183,15 +184,18 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
     public void removePostFromFavList(final ViewHolder holder,final PostItem postItem){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         DocumentReference favRef = FirebaseFirestore.getInstance()
                 .collection("favorites")
                 .document(user.getEmail())
                 .collection("favoritedAds")
                 .document(postItem.getPostId());
+
         favRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG,"Ad removed from fav List.");
+                Toasty.info(context,"Removed from Favorites!").show();
                 setFavButton(holder,postItem);
             }
         }).addOnFailureListener(new OnFailureListener() {

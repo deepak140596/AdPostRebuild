@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.sapicons.deepak.k2psap.Fragments.ChatsFragment
 import com.sapicons.deepak.k2psap.Fragments.ExploreFragment
+import com.sapicons.deepak.k2psap.Fragments.FavoritesFragment
 import com.sapicons.deepak.k2psap.Fragments.PostFragment
 import com.sapicons.deepak.k2psap.Others.UserLocation
 import com.sapicons.deepak.k2psap.R
@@ -149,8 +150,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                         fragment = PostFragment()
                     }
                     R.id.bottom_navigation_favorites -> {
-
-
+                        fragment = FavoritesFragment()
                     }
                     R.id.bottom_navigation_chat -> {
                         fragment = ChatsFragment()

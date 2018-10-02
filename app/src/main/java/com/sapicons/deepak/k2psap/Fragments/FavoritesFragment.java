@@ -1,14 +1,11 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
 import android.app.Fragment;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,6 +17,7 @@ import android.widget.SearchView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -27,40 +25,31 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
-import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
-import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
-import com.sapicons.deepak.k2psap.Others.RecyclerViewTouchListener;
 import com.sapicons.deepak.k2psap.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import es.dmoral.toasty.Toasty;
-
 /**
- * Created by Deepak Prasad on 29-09-2018.
+ * Created by Deepak Prasad on 02-10-2018.
  */
 
-public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener  {
+public class FavoritesFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener   {
+
+    String TAG = "FAV_FRAG";
 
     ListView adListView;
-    //RecyclerView adRecyclerView;
-    ViewPager mostRecentViewPager;
     List<PostItem> postList;
     AdPostAdapter postItemAdapter;
-    //RecyclerView.Adapter postItemRAdapter;
-    //RecyclerView.LayoutManager mLayoutManager;
     Context context;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getActivity().setTitle("Nearby ");
+        getActivity().setTitle("Favorites ");
 
-        View view = inflater.inflate(R.layout.fragment_explore,container,false);
-        //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
-
+        View view = inflater.inflate(R.layout.fragment_favorites,container,false);
         context = getActivity();
         return view;
     }
@@ -72,12 +61,12 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         listenToChanges();
     }
 
+
     public void initialiseViews(View view){
 
 
-        adListView =view.findViewById(R.id.frag_explore_ads_list_view);
+        adListView =view.findViewById(R.id.frag_fav_listview);
         //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
-        mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
 
         //mLayoutManager = new LinearLayoutManager(context);
         //adRecyclerView.setLayoutManager(mLayoutManager);
@@ -120,25 +109,30 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         });
     }
 
+
     public void listenToChanges(){
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //final CollectionReference docRef = db.collection("users").document(user.getEmail()).collection("");
 
-        db.collection("ads")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        CollectionReference favRef = db.collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds");
+
+        favRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
                                         @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
-                            Log.w("EXPL_FRAG", "Listen failed.", e);
+                            Log.w(TAG, "Listen failed.", e);
                             return;
                         }
 
                         List<PostItem> new_list = new ArrayList<>();
                         for (QueryDocumentSnapshot doc : value) {
                             PostItem newItem = doc.toObject(PostItem.class);
-                            Log.d("EXPL_FRAG","Post: "+newItem.getTitle());
+                            Log.d(TAG,"Post: "+newItem.getTitle());
                             new_list.add(newItem);
 
                         }
@@ -149,20 +143,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         //adRecyclerView.setAdapter(postItemRAdapter);
 
                         //postItemRAdapter.notifyDataSetChanged();
-                        setUpViewPager();
                         //progressDialog.dismiss();
 
                     }
                 });
-    }
-
-    public void setUpViewPager(){
-
-        List<PostItem> newList = postList;
-        Collections.sort(newList,PostItem.PostTimeComparator);
-        newList = newList.subList(0,5);
-        AdPostViewPagerAdapter adapter = new AdPostViewPagerAdapter(context,newList);
-        mostRecentViewPager.setAdapter(adapter);
     }
     @Override
     public boolean onMenuItemActionExpand(MenuItem menuItem) {

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,12 +23,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
@@ -39,9 +42,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class AdPreviewActivity extends AppCompatActivity {
+    String TAG = "AD_PREVIEW_ACTIVITY";
 
     PostItem postItem;
     ViewPager viewPager;
@@ -50,9 +55,12 @@ public class AdPreviewActivity extends AppCompatActivity {
     FancyButton callBtn, messageBtn;
     LinearLayout contactLL;
     RelativeLayout closeRl;
+    FloatingActionButton addRemFavBtn;
 
     FirebaseUser user;
     ProgressDialog progressDialog;
+
+    boolean isFav = false;
 
 
     @Override
@@ -67,6 +75,7 @@ public class AdPreviewActivity extends AppCompatActivity {
         initialiseViews();
         setupViews();
         setUpViewPager();
+        setUpFavButton();
     }
 
     public void initialiseViews(){
@@ -84,6 +93,8 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         contactLL= findViewById(R.id.ad_preview_contact_ll);
         closeRl = findViewById(R.id.ad_preview_close_post_rl);
+        addRemFavBtn = findViewById(R.id.ad_preview_set_rem_fav_fab);
+
 
         progressDialog = new ProgressDialog(this);
 
@@ -115,7 +126,6 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         // setup close post feature
 
-        // setup set favorites feature
 
         // setup contact
         // setup chat
@@ -132,6 +142,17 @@ public class AdPreviewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 callSeller();
+            }
+        });
+
+        // setup fav button
+        addRemFavBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isFav)
+                    removePostFromFavList();
+                else
+                    addPostToFavList();
             }
         });
 
@@ -259,6 +280,87 @@ public class AdPreviewActivity extends AppCompatActivity {
         String phone = postItem.getPhoneNumber();
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel",phone,null));
         startActivity(intent);
+    }
+
+    public void setUpFavButton(){
+        showProgressDialog("Please Wait ...");
+        DocumentReference favRef = FirebaseFirestore.getInstance()
+                .collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds")
+                .document(postItem.getPostId());
+
+        favRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                progressDialog.dismiss();
+                if(task.isSuccessful()){
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if(documentSnapshot.exists()){
+
+                        // if already favorited
+                        addRemFavBtn.setImageResource(R.drawable.ic_star_black_24dp);
+                        isFav = true;
+
+                    }else{
+                        //no such doc exits
+                        // if not favorited
+                        Log.d(TAG,"No such doc exits!");
+                        addRemFavBtn.setImageResource(R.drawable.ic_star_border_black_24dp);
+                        isFav = false;
+
+                    }
+                }else{
+                    Log.d(TAG,"Error getting document!");
+                }
+            }
+        });
+    }
+
+
+    public void addPostToFavList(){
+        DocumentReference favRef = FirebaseFirestore.getInstance()
+                .collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds")
+                .document(postItem.getPostId());
+
+
+        favRef.set(postItem).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG,"Ad Favorited!");
+                Toasty.info(AdPreviewActivity.this,"Added to Favorites!").show();
+                setUpFavButton();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,"Failed to update favorites!   " + e);
+            }
+        });
+    }
+
+    public void removePostFromFavList(){
+        DocumentReference favRef = FirebaseFirestore.getInstance()
+                .collection("favorites")
+                .document(user.getEmail())
+                .collection("favoritedAds")
+                .document(postItem.getPostId());
+
+        favRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG,"Ad removed from fav List.");
+                Toasty.info(AdPreviewActivity.this,"Removed from Favorites!").show();
+                setUpFavButton();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,"Failed to remove ad from fav list.   "+e);
+            }
+        });
     }
 
 }
