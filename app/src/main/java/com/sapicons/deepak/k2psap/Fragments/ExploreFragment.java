@@ -1,11 +1,18 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +37,9 @@ import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.Others.RecyclerViewTouchListener;
+import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
 
 import java.util.ArrayList;
@@ -43,7 +52,8 @@ import es.dmoral.toasty.Toasty;
  * Created by Deepak Prasad on 29-09-2018.
  */
 
-public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener  {
+public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+    String TAG = "EXP_FRAG";
 
     ListView adListView;
     //RecyclerView adRecyclerView;
@@ -54,11 +64,12 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     //RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().setTitle("Nearby ");
 
-        View view = inflater.inflate(R.layout.fragment_explore,container,false);
+        View view = inflater.inflate(R.layout.fragment_explore, container, false);
         //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
 
         context = getActivity();
@@ -72,10 +83,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         listenToChanges();
     }
 
-    public void initialiseViews(View view){
+    public void initialiseViews(View view) {
 
 
-        adListView =view.findViewById(R.id.frag_explore_ads_list_view);
+        adListView = view.findViewById(R.id.frag_explore_ads_list_view);
         //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
         mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
 
@@ -87,7 +98,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
         adListView.setAdapter(postItemAdapter);
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
@@ -113,14 +124,14 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
                 //Bundle bundle =
-                PostItem item = (PostItem)adapterView.getItemAtPosition(i);
-                intent.putExtra("selected_post_item",item);
+                PostItem item = (PostItem) adapterView.getItemAtPosition(i);
+                intent.putExtra("selected_post_item", item);
                 startActivity(intent);
             }
         });
     }
 
-    public void listenToChanges(){
+    public void listenToChanges() {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //final CollectionReference docRef = db.collection("users").document(user.getEmail()).collection("");
@@ -138,12 +149,13 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         List<PostItem> new_list = new ArrayList<>();
                         for (QueryDocumentSnapshot doc : value) {
                             PostItem newItem = doc.toObject(PostItem.class);
-                            Log.d("EXPL_FRAG","Post: "+newItem.getTitle());
-                            new_list.add(newItem);
+                            Log.d("EXPL_FRAG", "Post: " + newItem.getTitle());
+                            if (isNearby(newItem))
+                                new_list.add(newItem);
 
                         }
                         postList = new_list;
-                        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
+                        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
                         adListView.setAdapter(postItemAdapter);
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);
@@ -156,14 +168,28 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 });
     }
 
-    public void setUpViewPager(){
+    public void setUpViewPager() {
 
         List<PostItem> newList = postList;
-        Collections.sort(newList,PostItem.PostTimeComparator);
-        newList = newList.subList(0,5);
-        AdPostViewPagerAdapter adapter = new AdPostViewPagerAdapter(context,newList);
+        Collections.sort(newList, PostItem.PostTimeComparator);
+        newList = newList.subList(0, 5);
+        AdPostViewPagerAdapter adapter = new AdPostViewPagerAdapter(context, newList);
         mostRecentViewPager.setAdapter(adapter);
     }
+
+    public boolean isNearby(PostItem postItem) {
+        CalculateDistance calculateDistance = new CalculateDistance(context);
+        double lat1 = postItem.getLatitude();
+        double long1 = postItem.getLongitude();
+
+        double distanceInKMeters = calculateDistance.distanceInKM(lat1,long1);
+
+        Log.d("EXP_FRAG","Distance: "+distanceInKMeters);
+
+        return calculateDistance.isNearby(distanceInKMeters);
+    }
+
+
     @Override
     public boolean onMenuItemActionExpand(MenuItem menuItem) {
         return false;

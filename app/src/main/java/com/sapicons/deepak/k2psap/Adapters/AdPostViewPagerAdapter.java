@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.R;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -55,10 +57,13 @@ public class AdPostViewPagerAdapter extends PagerAdapter {
         }
         title.setText(postItem.getTitle());
         price.setText(postItem.getPrice());
+        location.setText(setDistance(postItem));
 
         //set up date
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMMM");
         date.setText(dateFormatter.format(Long.parseLong(postItem.getPostId())));
+
+
 
 
 
@@ -73,6 +78,17 @@ public class AdPostViewPagerAdapter extends PagerAdapter {
 
         return view;
     }
+
+    public String setDistance(PostItem postItem){
+        CalculateDistance calculateDistance = new CalculateDistance(context);
+        double distance = calculateDistance.distanceInKM(postItem.getLatitude(),postItem.getLongitude());
+        DecimalFormat value = new DecimalFormat("#.#");
+
+        return value.format(distance)+" kms away";
+
+
+    }
+
     @Override
     public int getCount() {
         return list.size();

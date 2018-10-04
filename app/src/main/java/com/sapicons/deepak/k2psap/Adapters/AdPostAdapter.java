@@ -26,8 +26,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.R;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -56,7 +58,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
     static class ViewHolder{
 
-        TextView titleTv, descriptionTv, priceTv;
+        TextView titleTv, descriptionTv, priceTv, distanceTv;
         ImageView coverIv;
         boolean isFavorited=false;
         ImageView favButton,unfavButton;
@@ -79,6 +81,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             holder.descriptionTv = convertView.findViewById(R.id.item_ad_post_description_tv);
             holder.priceTv = convertView.findViewById(R.id.item_ad_post_price_tv);
             holder.coverIv = convertView.findViewById(R.id.item_ad_post_imageview);
+            holder.distanceTv = convertView.findViewById(R.id.item_ad_post_distance_tv);
 
             holder.position = position;
 
@@ -95,6 +98,8 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         holder.titleTv.setText(postItem.getTitle());
         holder.descriptionTv.setText(postItem.getDescription());
         holder.priceTv.setText(postItem.getPrice());
+
+        holder.distanceTv.setText(setDistance(postItem));
 
         if(!postItem.getImgUrlOne().isEmpty())
             Glide.with(context).load(postItem.getImgUrlOne()).into(holder.coverIv);
@@ -204,6 +209,16 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
                 Log.d(TAG,"Failed to remove ad from fav list.   "+e);
             }
         });
+    }
+
+    public String setDistance(PostItem postItem){
+        CalculateDistance calculateDistance = new CalculateDistance(context);
+        double distance = calculateDistance.distanceInKM(postItem.getLatitude(),postItem.getLongitude());
+        DecimalFormat value = new DecimalFormat("#.#");
+
+        return value.format(distance)+" kms away";
+
+
     }
 
 }

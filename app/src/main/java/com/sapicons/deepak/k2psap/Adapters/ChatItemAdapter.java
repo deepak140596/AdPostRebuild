@@ -24,8 +24,10 @@ import com.sapicons.deepak.k2psap.Activities.ChatActivity;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.Objects.UserItem;
+import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.R;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -104,7 +106,8 @@ public class ChatItemAdapter extends RecyclerView.Adapter<ChatItemAdapter.ChatIt
                             holder.adImageView.setImageResource(R.mipmap.ic_android_icon);
 
                         // set distance with latitude and longitude
-                        // TODO
+
+                        holder.distanceAwayTv.setText(setDistance(postItem));
 
                     }else {
                         Log.d("CIA","No such doc exits");
@@ -170,5 +173,15 @@ public class ChatItemAdapter extends RecyclerView.Adapter<ChatItemAdapter.ChatIt
         long now = Calendar.getInstance().getTimeInMillis();
         CharSequence ago = DateUtils.getRelativeTimeSpanString(oldTime,now,DateUtils.MINUTE_IN_MILLIS);
         return ago.toString();
+    }
+
+    public String setDistance(PostItem postItem){
+        CalculateDistance calculateDistance = new CalculateDistance(context);
+        double distance = calculateDistance.distanceInKM(postItem.getLatitude(),postItem.getLongitude());
+        DecimalFormat value = new DecimalFormat("#.#");
+
+        return value.format(distance)+" kms away";
+
+
     }
 }

@@ -35,8 +35,10 @@ import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.R;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -104,6 +106,7 @@ public class AdPreviewActivity extends AppCompatActivity {
         titleTv.setText(postItem.getTitle());
         descriptionTv.setText(postItem.getDescription());
         priceTv.setText(postItem.getPrice());
+        distanceTv.setText(setDistance(postItem));
 
         // set category
         getCategoriesFromDatabase(postItem.getCategory());
@@ -361,6 +364,16 @@ public class AdPreviewActivity extends AppCompatActivity {
                 Log.d(TAG,"Failed to remove ad from fav list.   "+e);
             }
         });
+    }
+
+    public String setDistance(PostItem postItem){
+        CalculateDistance calculateDistance = new CalculateDistance(this);
+        double distance = calculateDistance.distanceInKM(postItem.getLatitude(),postItem.getLongitude());
+        DecimalFormat value = new DecimalFormat("#.#");
+
+        return value.format(distance)+" kms away";
+
+
     }
 
 }
