@@ -18,6 +18,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,12 +38,14 @@ import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
+import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.Others.RecyclerViewTouchListener;
 import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,10 +68,16 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     //RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
+    List<CategoryItem> list = new ArrayList<>();
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getActivity().setTitle("Nearby ");
+        getActivity().setTitle("");
+
+        // setup options menu
+        setHasOptionsMenu(true);
 
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
         //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
@@ -79,6 +89,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
+        getCategoriesFromDatabase();
         initialiseViews(view);
         listenToChanges();
     }
@@ -172,7 +183,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         List<PostItem> newList = postList;
         Collections.sort(newList, PostItem.PostTimeComparator);
-        newList = newList.subList(0, 5);
+        int noOfItemsToShow = (newList.size()>5)?5:newList.size();
+        newList = newList.subList(0, noOfItemsToShow);
         AdPostViewPagerAdapter adapter = new AdPostViewPagerAdapter(context, newList);
         mostRecentViewPager.setAdapter(adapter);
     }
@@ -191,6 +203,24 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.collapsed_search_menu,menu);
+        inflater.inflate(R.menu.sort_by_type_menu,menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint("Search Nearby Ads ...");
+        searchView.setOnQueryTextListener(this);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onMenuItemActionExpand(MenuItem menuItem) {
         return false;
     }
@@ -206,7 +236,56 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     @Override
-    public boolean onQueryTextChange(String s) {
+    public boolean onQueryTextChange(String newText) {
+
+
+        if (newText == null || newText.trim().isEmpty()) {
+            resetSearch();
+            return false;
+        }
+        List<PostItem> filteredValues = new ArrayList<PostItem>(postList);
+        for (PostItem value : postList) {
+
+            String searchString = value.getTitle()+ " " + value.getCategoryName();
+            searchString=searchString.toLowerCase();
+
+            if (!searchString.contains(newText.toLowerCase())) {
+
+                filteredValues.remove(value);
+            }
+        }
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, filteredValues);
+        adListView.setAdapter(postItemAdapter);
+
         return false;
+    }
+
+    public void resetSearch(){
+
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
+        adListView.setAdapter(postItemAdapter);
+    }
+
+    public void getCategoriesFromDatabase(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        list = new ArrayList<>();
+
+        db.collection("categories")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot value, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                        if(e != null){
+                            Log.d(TAG,"Listen failed!",e);
+                            return;
+                        }
+                        for(QueryDocumentSnapshot doc : value){
+                            CategoryItem item = doc.toObject(CategoryItem.class);
+                            list.add(item);
+                        }
+
+                    }
+                });
     }
 }

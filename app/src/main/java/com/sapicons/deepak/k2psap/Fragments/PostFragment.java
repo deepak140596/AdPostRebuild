@@ -89,6 +89,7 @@ public class PostFragment extends Fragment {
 
     Uri imgOneUri, imgTwoUri, imgThreeUri, imgFourUri, imgFiveUri;
     int categoryId ;
+    String categoryName;
     String imgOneUrl="", imgTwoUrl="",imgThreeUrl="",imgFourUrl="",imgFiveUrl="";
     String confirmedPhoneNumber = "";
 
@@ -337,6 +338,7 @@ public class PostFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 categoryId = list.get(i).getId();
+                categoryName = list.get(i).getName();
             }
 
             @Override
@@ -487,7 +489,7 @@ public class PostFragment extends Fragment {
         float latitude = sharedPreferences.getFloat("latitude",0.0f);
         float longitude = sharedPreferences.getFloat("longitude",0.0f);
 
-        PostItem postItem = new PostItem(postId,email,title,description,price,category);
+        PostItem postItem = new PostItem(postId,email,title,description,price,category,categoryName);
         postItem.setPhoneNumber(phoneNumber);
         postItem.setLatitude(latitude);
         postItem.setLongitude(longitude);

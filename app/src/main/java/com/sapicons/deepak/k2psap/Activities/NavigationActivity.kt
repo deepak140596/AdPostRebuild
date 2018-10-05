@@ -20,23 +20,28 @@ import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import com.sapicons.deepak.k2psap.Fragments.ChatsFragment
 import com.sapicons.deepak.k2psap.Fragments.ExploreFragment
 import com.sapicons.deepak.k2psap.Fragments.FavoritesFragment
 import com.sapicons.deepak.k2psap.Fragments.PostFragment
+import com.sapicons.deepak.k2psap.Objects.CategoryItem
 import com.sapicons.deepak.k2psap.Others.UserLocation
 import com.sapicons.deepak.k2psap.R
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.content_navigation.*
+import java.util.ArrayList
 
 class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     var auth: FirebaseAuth ?=null
     private var doubleBackToExit = false
     lateinit var locationManager : LocationManager
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +68,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         askForPermissions()
 
         //start explore fragment
-        startExploreFragment();
+        startExploreFragment()
 
     }
 
@@ -89,7 +94,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     // setup UI (menus, bottom Nav bar, Side Nav bar)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.navigation, menu)
+        //menuInflater.inflate(R.menu.navigation, menu)
+        //menuInflater.inflate(R.menu.collapsed_search_menu,menu)
         return true
     }
 
@@ -97,10 +103,13 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        /*
         when (item.itemId) {
             R.id.action_settings -> return true
             else -> return super.onOptionsItemSelected(item)
         }
+        */
+        return true
     }
 
 
@@ -238,4 +247,6 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         }
     }
+
+
 }

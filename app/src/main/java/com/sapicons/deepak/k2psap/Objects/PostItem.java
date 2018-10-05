@@ -13,13 +13,14 @@ public class PostItem implements Serializable {
     int category;
     String imgUrlOne, imgUrlTwo, imgUrlThree, imgUrlFour, imgUrlFive;
     String status;
+    String categoryName;
 
     float latitude, longitude;
 
     public PostItem(){ }
 
 
-    public PostItem(String postId, String emailId, String title, String description, String price, int category){
+    public PostItem(String postId, String emailId, String title, String description, String price, int category, String categoryName){
 
         this.postId = postId;
         this.emailId = emailId;
@@ -27,6 +28,7 @@ public class PostItem implements Serializable {
         this.description= description;
         this.price = price;
         this.category = category;
+        this.categoryName = categoryName;
 
         this.phoneNumber= "";
         this.imgUrlFive = "";
@@ -38,6 +40,8 @@ public class PostItem implements Serializable {
 
         this.latitude = 0.0f;
         this.longitude =0.0f;
+
+
 
     }
 
@@ -161,6 +165,13 @@ public class PostItem implements Serializable {
         this.imgUrlFive = imgUrlFive;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
     public static Comparator<PostItem> PostTimeComparator = new Comparator<PostItem>() {
         @Override
