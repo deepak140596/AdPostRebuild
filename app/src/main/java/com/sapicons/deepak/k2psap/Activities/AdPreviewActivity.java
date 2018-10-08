@@ -222,6 +222,7 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         PhotoPreviewPagerAdapter adapter = new PhotoPreviewPagerAdapter(this,list);
         viewPager.setAdapter(adapter);
+        NUM_PAGES = list.size();
 
         setUpSlideShow();
     }
@@ -389,6 +390,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     }
 
     public void setUpSlideShow(){
+
 
         final Handler handler = new Handler();
         final Runnable Update = new Runnable() {

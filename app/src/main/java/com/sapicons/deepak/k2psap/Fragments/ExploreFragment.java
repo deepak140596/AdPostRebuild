@@ -77,7 +77,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     //RecyclerView adRecyclerView;
     ViewPager mostRecentViewPager;
     List<PostItem> nearbyPostList;
-    List<PostItem> selectedCategoryList;
+    List<PostItem> selectedCategoryPostList;
     AdPostAdapter postItemAdapter;
     //RecyclerView.Adapter postItemRAdapter;
     //RecyclerView.LayoutManager mLayoutManager;
@@ -284,8 +284,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             resetSearch();
             return false;
         }
-        List<PostItem> filteredValues = new ArrayList<PostItem>(nearbyPostList);
-        for (PostItem value : nearbyPostList) {
+        List<PostItem> filteredValues = new ArrayList<PostItem>(selectedCategoryPostList);
+        for (PostItem value : selectedCategoryPostList) {
 
             String searchString = value.getTitle()+ " " + value.getCategoryName();
             searchString=searchString.toLowerCase();
@@ -301,12 +301,29 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         return false;
     }
 
+    public void filterByCategory(String category){
+        if(category == null || category.trim().isEmpty()){
+            return ;
+        }
+
+        selectedCategoryPostList = new ArrayList<>(nearbyPostList);
+        for(PostItem item : nearbyPostList){
+            String searchString = item.getCategoryName().toLowerCase();
+
+            if(!searchString.contains(category.toLowerCase()))
+                selectedCategoryPostList.remove(item);
+        }
+
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, selectedCategoryPostList);
+        adListView.setAdapter(postItemAdapter);
+    }
+
 
 
     public void resetSearch(){
 
         mostRecentViewPager.setVisibility(View.VISIBLE);
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, nearbyPostList);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, selectedCategoryPostList);
         adListView.setAdapter(postItemAdapter);
     }
 
@@ -337,6 +354,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 // set filter
                 String cateName = ((CategoryItem)adapter.getItem(i)).getName();
                 Log.d(TAG,"CAT_SELECTED: "+cateName);
+
+                //filter by category
+                filterByCategory(cateName);
 
                 popupWindow.dismiss();
             }
