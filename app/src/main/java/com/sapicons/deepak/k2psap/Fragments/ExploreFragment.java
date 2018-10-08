@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -60,6 +61,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import es.dmoral.toasty.Toasty;
 
@@ -83,6 +86,13 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     PopupWindow popupWindow;
     List<CategoryItem> categoryList = NavigationActivity.getCategoryList();
+
+    // related to slideshow
+    int currentPage = 0;
+    Timer timer;
+    final long DELAY_MS = 500;//delay in milliseconds before task is to be executed
+    final long PERIOD_MS = 3000; // time in milliseconds between successive task executions.
+    int NUM_PAGES;
 
 
     @Override
@@ -197,9 +207,12 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         List<PostItem> newList = nearbyPostList;
         Collections.sort(newList, PostItem.PostTimeComparator);
         int noOfItemsToShow = (newList.size()>5)?5:newList.size();
+        NUM_PAGES = noOfItemsToShow;
         newList = newList.subList(0, noOfItemsToShow);
         AdPostViewPagerAdapter adapter = new AdPostViewPagerAdapter(context, newList);
         mostRecentViewPager.setAdapter(adapter);
+
+        setUpSlideShow();
     }
 
     public boolean isNearby(PostItem postItem) {
@@ -297,33 +310,6 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         adListView.setAdapter(postItemAdapter);
     }
 
-    /*
-    public void getCategoriesFromDatabase(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        categoryList = new ArrayList<>();
-
-        db.collection("categories")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot value, @javax.annotation.Nullable FirebaseFirestoreException e) {
-
-                        if(e != null){
-                            Log.d(TAG,"Listen failed!",e);
-                            return;
-                        }
-                        for(QueryDocumentSnapshot doc : value){
-                            CategoryItem item = doc.toObject(CategoryItem.class);
-                            Log.d(TAG,"CATEGORIES: "+ item.getName());
-                            categoryList.add(item);
-                        }
-
-                    }
-                });
-    }
-    */
-
-
 
     private PopupWindow popupCategories() {
 
@@ -366,5 +352,27 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
         return popupWindow;
+    }
+
+    public void setUpSlideShow(){
+
+        final Handler handler = new Handler();
+        final Runnable Update = new Runnable() {
+            public void run() {
+                if (currentPage == NUM_PAGES) {
+                    currentPage = 0;
+                }
+                mostRecentViewPager.setCurrentItem(currentPage++, true);
+            }
+        };
+
+        timer = new Timer(); // This will create a new Thread
+        timer .schedule(new TimerTask() { // task to be scheduled
+
+            @Override
+            public void run() {
+                handler.post(Update);
+            }
+        }, DELAY_MS, PERIOD_MS);
     }
 }

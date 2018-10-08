@@ -3,6 +3,7 @@ package com.sapicons.deepak.k2psap.Activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
@@ -43,6 +44,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import es.dmoral.toasty.Toasty;
 import mehdi.sakout.fancybuttons.FancyButton;
@@ -63,6 +66,13 @@ public class AdPreviewActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
 
     boolean isFav = false;
+
+    // related to slideshow
+    int currentPage = 0;
+    Timer timer;
+    final long DELAY_MS = 500;//delay in milliseconds before task is to be executed
+    final long PERIOD_MS = 3000; // time in milliseconds between successive task executions.
+    int NUM_PAGES;
 
 
     @Override
@@ -212,6 +222,8 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         PhotoPreviewPagerAdapter adapter = new PhotoPreviewPagerAdapter(this,list);
         viewPager.setAdapter(adapter);
+
+        setUpSlideShow();
     }
 
     public void setUpDate(){
@@ -376,4 +388,25 @@ public class AdPreviewActivity extends AppCompatActivity {
 
     }
 
+    public void setUpSlideShow(){
+
+        final Handler handler = new Handler();
+        final Runnable Update = new Runnable() {
+            public void run() {
+                if (currentPage == NUM_PAGES) {
+                    currentPage = 0;
+                }
+                viewPager.setCurrentItem(currentPage++, true);
+            }
+        };
+
+        timer = new Timer(); // This will create a new Thread
+        timer .schedule(new TimerTask() { // task to be scheduled
+
+            @Override
+            public void run() {
+                handler.post(Update);
+            }
+        }, DELAY_MS, PERIOD_MS);
+    }
 }
