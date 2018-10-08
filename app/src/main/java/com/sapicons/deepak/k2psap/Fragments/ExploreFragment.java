@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -19,15 +20,19 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -43,6 +48,7 @@ import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
+import com.sapicons.deepak.k2psap.Adapters.CategoryAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.Others.CalculateDistance;
@@ -67,13 +73,15 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     ListView adListView;
     //RecyclerView adRecyclerView;
     ViewPager mostRecentViewPager;
-    List<PostItem> postList;
+    List<PostItem> nearbyPostList;
+    List<PostItem> selectedCategoryList;
     AdPostAdapter postItemAdapter;
     //RecyclerView.Adapter postItemRAdapter;
     //RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
 
+    PopupWindow popupWindow;
     List<CategoryItem> categoryList = NavigationActivity.getCategoryList();
 
 
@@ -113,8 +121,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         //adRecyclerView.setAdapter(postItemRAdapter);
 
 
-        postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
+        nearbyPostList = new ArrayList<>();
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, nearbyPostList);
         adListView.setAdapter(postItemAdapter);
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
@@ -166,12 +174,12 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         for (QueryDocumentSnapshot doc : value) {
                             PostItem newItem = doc.toObject(PostItem.class);
                             Log.d("EXPL_FRAG", "Post: " + newItem.getTitle());
-                            if (isNearby(newItem))
+                            if (isNearby(newItem))  // filter according to distance
                                 new_list.add(newItem);
 
                         }
-                        postList = new_list;
-                        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
+                        nearbyPostList = new_list;
+                        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, nearbyPostList);
                         adListView.setAdapter(postItemAdapter);
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);
@@ -186,7 +194,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     public void setUpViewPager() {
 
-        List<PostItem> newList = postList;
+        List<PostItem> newList = nearbyPostList;
         Collections.sort(newList, PostItem.PostTimeComparator);
         int noOfItemsToShow = (newList.size()>5)?5:newList.size();
         newList = newList.subList(0, noOfItemsToShow);
@@ -230,7 +238,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         if(itemId == R.id.action_sort){
 
             //Toasty.normal(context,"Clicked").show();
-            showAllCategories();
+
+            //View view = getLayoutInflater().inflate(R.layout.fragment_explore,null);
+            PopupWindow popupWindow = popupCategories();
+            popupWindow.showAtLocation(mostRecentViewPager, Gravity.CENTER,0,0);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -260,8 +271,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             resetSearch();
             return false;
         }
-        List<PostItem> filteredValues = new ArrayList<PostItem>(postList);
-        for (PostItem value : postList) {
+        List<PostItem> filteredValues = new ArrayList<PostItem>(nearbyPostList);
+        for (PostItem value : nearbyPostList) {
 
             String searchString = value.getTitle()+ " " + value.getCategoryName();
             searchString=searchString.toLowerCase();
@@ -277,14 +288,17 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         return false;
     }
 
+
+
     public void resetSearch(){
 
         mostRecentViewPager.setVisibility(View.VISIBLE);
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, nearbyPostList);
         adListView.setAdapter(postItemAdapter);
     }
 
-    /*public void getCategoriesFromDatabase(){
+    /*
+    public void getCategoriesFromDatabase(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         categoryList = new ArrayList<>();
@@ -306,46 +320,51 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                     }
                 });
-    }*/
-
-    public void showAllCategories(){
-
-        categoryList = NavigationActivity.getCategoryList();
+    }
+    */
 
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View parentView = layoutInflater.inflate(R.layout.empty_view,null);
 
-        final LinearLayout parentLayout = parentView.findViewById(R.id.empty_view_linear_layout);
+    private PopupWindow popupCategories() {
 
-        // add categories
-        for(CategoryItem item : categoryList){
-            LayoutInflater newLayoutInflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view;
+        // initialize a pop up window type
+        popupWindow = new PopupWindow(context);
 
-            view = newLayoutInflater.inflate(R.layout.item_category, parentLayout, false);
-            final TextView nameTextView = view.findViewById(R.id.item_category_name_tv);
-            nameTextView.setText(item.getName());
-            nameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onQueryTextChange(nameTextView.getText().toString());
-
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.dismiss();
-                }
-            });
-
-            parentLayout.addView(view);
-
+        ArrayList<String> filterList = new ArrayList<String>();
+        for(CategoryItem item: categoryList){
+            filterList.add(item.getName());
         }
 
-        builder.setView(parentView);
+        final CategoryAdapter adapter = new CategoryAdapter(context, R.layout.item_single_category, categoryList);
+        // the drop down list is a list view
 
-        builder.setTitle("Choose Category ")
-                .create()
-                .show();
+        ListView listViewSort = new ListView(context);
 
+        // set our adapter and pass our pop up window contents
+        listViewSort.setAdapter(adapter);
+        listViewSort.setBackgroundColor(Color.parseColor("#ffffff"));
+
+        // set on item selected
+        listViewSort.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // set filter
+                String cateName = ((CategoryItem)adapter.getItem(i)).getName();
+                Log.d(TAG,"CAT_SELECTED: "+cateName);
+
+                popupWindow.dismiss();
+            }
+        });
+
+        // some other visual settings for popup window
+        popupWindow.setFocusable(true);
+        popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        // popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.white));
+        popupWindow.setHeight(800);
+        // set the listview as popup content
+        popupWindow.setContentView(listViewSort);
+
+
+        return popupWindow;
     }
 }

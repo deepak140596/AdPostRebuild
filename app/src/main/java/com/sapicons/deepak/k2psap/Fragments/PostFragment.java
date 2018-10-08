@@ -294,35 +294,6 @@ public class PostFragment extends Fragment {
     }
 
 
-    // set up categories
-
-    public void getCategoriesFromDatabase(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        final List<CategoryItem> list = new ArrayList<>();
-        showProgressDialog("Please Wait ...");
-
-        db.collection("categories")
-                .document(getLocale())
-                .collection("categories")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot value, @javax.annotation.Nullable FirebaseFirestoreException e) {
-
-                        if(e != null){
-                            Log.d("POST_FRAG","Listen failed!",e);
-                            return;
-                        }
-                        for(QueryDocumentSnapshot doc : value){
-                            CategoryItem item = doc.toObject(CategoryItem.class);
-                            list.add(item);
-                        }
-                        progressDialog.dismiss();
-                        setCategoriesToSpinner(list);
-                    }
-                });
-    }
-
     public void setCategoriesToSpinner(final List<CategoryItem> list){
 
         // store the category names
