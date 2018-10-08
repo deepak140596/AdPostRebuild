@@ -53,6 +53,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
@@ -120,7 +121,8 @@ public class PostFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
         initialiseViews(view);
-        getCategoriesFromDatabase();
+        //getCategoriesFromDatabase();
+        setCategoriesToSpinner(NavigationActivity.getCategoryList());
     }
 
     public void  initialiseViews(View view){
@@ -301,6 +303,8 @@ public class PostFragment extends Fragment {
         showProgressDialog("Please Wait ...");
 
         db.collection("categories")
+                .document(getLocale())
+                .collection("categories")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable QuerySnapshot value, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -686,5 +690,11 @@ public class PostFragment extends Fragment {
                 Log.d(TAG,"Error updating phone number to DB. "+e);
             }
         });
+    }
+
+    public String getLocale(){
+        String locale = context.getResources().getConfiguration().locale.getCountry();
+        Log.d(TAG,"Country: "+locale);
+        return locale;
     }
 }

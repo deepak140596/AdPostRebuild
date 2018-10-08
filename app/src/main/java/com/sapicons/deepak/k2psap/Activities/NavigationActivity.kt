@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ProgressBar
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -43,6 +44,14 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private var doubleBackToExit = false
     lateinit var locationManager : LocationManager
 
+    //var categoryList: MutableList<CategoryItem> = ArrayList()
+    var TAG = "NAV_ACTIVITY"
+
+    companion object {
+       @JvmStatic var categoryList: MutableList<CategoryItem> = ArrayList()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
@@ -67,8 +76,13 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         // check for Permissions
         askForPermissions()
 
+        // get local categories
+        getCategoriesFromDatabase()
+
+
         //start explore fragment
-        startExploreFragment()
+        //startExploreFragment()
+
 
     }
 
@@ -247,6 +261,40 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
 
         }
+    }
+
+
+    fun getLocaleCountry(): String {
+        var locale = this.resources.configuration.locale.country
+        Log.d("LOCALE","Country: "+locale)
+        return locale
+    }
+
+
+    fun getCategoriesFromDatabase() {
+        val db = FirebaseFirestore.getInstance()
+
+        categoryList = ArrayList<CategoryItem>()
+
+        db.collection("categories")
+                .document(getLocaleCountry())
+                .collection("categories")
+                .addSnapshotListener(EventListener { value, e ->
+                    if (e != null) {
+                        Log.d(TAG, "Listen failed!", e)
+                        return@EventListener
+                    }
+                    for (doc in value!!) {
+                        val item = doc.toObject(CategoryItem::class.java)
+                        Log.d(TAG, "CATEGORIES: " + item.name)
+                        categoryList.add(item)
+                    }
+
+                    // save categories to database
+
+                    //start Fragments
+                    startExploreFragment()
+                })
     }
 
 

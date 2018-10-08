@@ -39,6 +39,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
+import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
@@ -72,8 +73,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     //RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
-    List<CategoryItem> categoryList = new ArrayList<>();
 
+    List<CategoryItem> categoryList = NavigationActivity.getCategoryList();
 
 
     @Override
@@ -93,7 +94,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        getCategoriesFromDatabase();
+        //getCategoriesFromDatabase();
         initialiseViews(view);
         listenToChanges();
     }
@@ -283,7 +284,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         adListView.setAdapter(postItemAdapter);
     }
 
-    public void getCategoriesFromDatabase(){
+    /*public void getCategoriesFromDatabase(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         categoryList = new ArrayList<>();
@@ -305,9 +306,11 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                     }
                 });
-    }
+    }*/
 
     public void showAllCategories(){
+
+        categoryList = NavigationActivity.getCategoryList();
 
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
