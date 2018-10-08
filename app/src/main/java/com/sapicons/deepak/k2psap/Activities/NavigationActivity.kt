@@ -109,7 +109,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             else -> return super.onOptionsItemSelected(item)
         }
         */
-        return true
+        //return super.onOptionsItemSelected(item)
+        return false
     }
 
 

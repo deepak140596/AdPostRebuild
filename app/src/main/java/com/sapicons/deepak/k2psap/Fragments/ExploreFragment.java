@@ -1,9 +1,11 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -24,8 +26,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -68,7 +72,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     //RecyclerView.LayoutManager mLayoutManager;
     Context context;
 
-    List<CategoryItem> list = new ArrayList<>();
+    List<CategoryItem> categoryList = new ArrayList<>();
 
 
 
@@ -207,16 +211,26 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         inflater.inflate(R.menu.collapsed_search_menu,menu);
         inflater.inflate(R.menu.sort_by_type_menu,menu);
 
+        MenuItem sortItem = menu.findItem(R.id.action_sort);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search Nearby Ads ...");
         searchView.setOnQueryTextListener(this);
+
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+
+        if(itemId == R.id.action_sort){
+
+            //Toasty.normal(context,"Clicked").show();
+            showAllCategories();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -237,6 +251,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public boolean onQueryTextChange(String newText) {
+
+        mostRecentViewPager.setVisibility(View.GONE);
 
 
         if (newText == null || newText.trim().isEmpty()) {
@@ -262,6 +278,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     public void resetSearch(){
 
+        mostRecentViewPager.setVisibility(View.VISIBLE);
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
         adListView.setAdapter(postItemAdapter);
     }
@@ -269,7 +286,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     public void getCategoriesFromDatabase(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        list = new ArrayList<>();
+        categoryList = new ArrayList<>();
 
         db.collection("categories")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -282,10 +299,50 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         }
                         for(QueryDocumentSnapshot doc : value){
                             CategoryItem item = doc.toObject(CategoryItem.class);
-                            list.add(item);
+                            Log.d(TAG,"CATEGORIES: "+ item.getName());
+                            categoryList.add(item);
                         }
 
                     }
                 });
+    }
+
+    public void showAllCategories(){
+
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View parentView = layoutInflater.inflate(R.layout.empty_view,null);
+
+        final LinearLayout parentLayout = parentView.findViewById(R.id.empty_view_linear_layout);
+
+        // add categories
+        for(CategoryItem item : categoryList){
+            LayoutInflater newLayoutInflater =  (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view;
+
+            view = newLayoutInflater.inflate(R.layout.item_category, parentLayout, false);
+            final TextView nameTextView = view.findViewById(R.id.item_category_name_tv);
+            nameTextView.setText(item.getName());
+            nameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onQueryTextChange(nameTextView.getText().toString());
+
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.dismiss();
+                }
+            });
+
+            parentLayout.addView(view);
+
+        }
+
+        builder.setView(parentView);
+
+        builder.setTitle("Choose Category ")
+                .create()
+                .show();
+
     }
 }
