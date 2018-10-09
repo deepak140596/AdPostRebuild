@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -45,6 +46,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
+import com.sapicons.deepak.k2psap.Activities.MapsActivity;
 import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
@@ -95,6 +97,11 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     int NUM_PAGES;
 
 
+    // for location and category selection
+    RelativeLayout selectCategoryRl, selectLocationRl;
+    TextView categorySelectedTv, selectedLocationTv;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().setTitle("");
@@ -114,6 +121,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         //getCategoriesFromDatabase();
         initialiseViews(view);
+        setOnClickListeners();
         listenToChanges();
     }
 
@@ -129,6 +137,13 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
         //adRecyclerView.setAdapter(postItemRAdapter);
+
+
+        // for location and category selection
+        selectCategoryRl = view.findViewById(R.id.frag_explore_select_category_rl);
+        selectLocationRl = view.findViewById(R.id.frag_explore_select_location_rl);
+        categorySelectedTv = view.findViewById(R.id.frag_explore_category_selected_tv);
+        selectedLocationTv = view.findViewById(R.id.frag_explore_location_tv);
 
 
         nearbyPostList = new ArrayList<>();
@@ -153,6 +168,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         }));*/
 
 
+
+    }
+
+    public void setOnClickListeners(){
         adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -161,6 +180,22 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 PostItem item = (PostItem) adapterView.getItemAtPosition(i);
                 intent.putExtra("selected_post_item", item);
                 startActivity(intent);
+            }
+        });
+
+
+        selectCategoryRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupWindow popupWindow = popupCategories();
+                popupWindow.showAtLocation(mostRecentViewPager, Gravity.CENTER,0,0);
+            }
+        });
+
+        selectLocationRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, MapsActivity.class));
             }
         });
     }
@@ -357,6 +392,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                 //filter by category
                 filterByCategory(cateName);
+                categorySelectedTv.setText(cateName);
 
                 popupWindow.dismiss();
             }

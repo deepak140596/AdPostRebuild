@@ -8,13 +8,66 @@
         <android.support.v4.view.ViewPager
             android:layout_width="match_parent"
             android:layout_height="130dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:id="@+id/frag_explore_vp"/>
         
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/frag_explore_select_location_rl"
+                    android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginRight="8dp"
+                            android:src="@mipmap/ic_location_black"
+                            android:id="@+id/frag_explore_location_icon"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@id/frag_explore_location_icon"
+                            android:text="Your Location"
+                            android:id="@+id/frag_explore_location_tv"/>
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/frag_explore_select_category_rl"
+                    android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginRight="8dp"
+                            android:layout_toLeftOf="@+id/frag_explore_category_selected_tv"
+                            android:src="@mipmap/ic_list_black"
+                            android:id="@+id/frag_explore_select_category_icon"/>
+
+                        <TextView
+                            android:id="@+id/frag_explore_category_selected_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:textColor="#2e7d32"
+                            android:text="Cars and Bikes" />
+
+                </RelativeLayout>
             
         </LinearLayout>
 
