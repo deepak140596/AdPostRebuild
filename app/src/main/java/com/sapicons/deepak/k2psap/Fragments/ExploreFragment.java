@@ -435,4 +435,11 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             }
         }, DELAY_MS, PERIOD_MS);
     }
+
+
+    @Override
+    public void onResume() {
+        listenToChanges();
+        super.onResume();
+    }
 }

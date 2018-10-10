@@ -18,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
@@ -45,9 +46,21 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
         mapFragment.getMapAsync(this);*/
 
         initialiseViews();
+        createPlacePicker();
 
+
+
+    }
+
+    public void initialiseViews(){
+        //saveLocationBtn =  findViewById(R.id.activity_maps_save_location_btn);
+        //savedLocation = (new UserLocation(this)).getSavedLocation();
+    }
+
+    public void createPlacePicker(){
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
 
         try {
             Log.d(TAG,"opening startActivityforResult");
@@ -57,11 +70,6 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
         }
-    }
-
-    public void initialiseViews(){
-        //saveLocationBtn =  findViewById(R.id.activity_maps_save_location_btn);
-        //savedLocation = (new UserLocation(this)).getSavedLocation();
     }
 
     /**
