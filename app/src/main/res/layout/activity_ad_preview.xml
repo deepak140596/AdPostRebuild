@@ -169,11 +169,11 @@
                 android:layout_centerInParent="true"
                 android:id="@+id/ad_preview_close_btn"
                 fancy:fb_text="Close Ad"
-                fancy:fb_textColor="#000000"
+                fancy:fb_textColor="@color/black"
                 fancy:fb_radius="10dp"
                 fancy:fb_iconResource="@mipmap/ic_close_icon"
-                fancy:fb_focusColor="#5577bd"
-                fancy:fb_defaultColor="#b5e4d5"/>
+                fancy:fb_focusColor="@color/indigo400"
+                fancy:fb_defaultColor="@color/teal100"/>
         </RelativeLayout>
 
 

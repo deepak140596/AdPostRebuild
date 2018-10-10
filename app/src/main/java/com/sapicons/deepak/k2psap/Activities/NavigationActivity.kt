@@ -4,10 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Fragment
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
@@ -91,6 +93,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
             if(doubleBackToExit){
+
+                // set manually set location to false
+                // next time the app starts with live location of the user
+                setManualLocation(false)
                 super.onBackPressed()
             }else{
 
@@ -222,9 +228,15 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     @SuppressLint("MissingPermission")
     // get user location
     fun getUserLocation(){
+        var sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        var isLocationManual = sharedPref.getBoolean("isLocationManual",false)
 
         var userLocation = UserLocation(this)
-        locationManager = userLocation.locationManager
+        if(!isLocationManual) {
+            locationManager = userLocation.locationManager
+            Log.d("NA", "LM: " + locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER))
+        }
+
 
         /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) run {
@@ -233,7 +245,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
                     1)
         } else*/
-        Log.d("NA","LM: "+locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER))
+
 
     }
 
@@ -297,5 +309,13 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 })
     }
 
+    fun setManualLocation(isLocationManual: Boolean){
+        var sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        var editor = sharedPref.edit()
+
+        editor.putBoolean("isLocationManual",isLocationManual)
+        editor.apply()
+        editor.commit()
+    }
 
 }

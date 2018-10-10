@@ -50,7 +50,7 @@ public class UserLocation {
 
                 // if location changes, update the location on device as well as on update location history on database
                 saveLocationToSharedPreferences(location);
-                saveUserHistory(location);
+                //saveUserHistory(location);
 
             }
 
@@ -92,6 +92,17 @@ public class UserLocation {
         editor.apply();
         editor.commit();
 
+    }
+
+    public Location getSavedLocation(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        float lat = sharedPreferences.getFloat("latitude",0);
+        float lon = sharedPreferences.getFloat("longitude",0);
+        Location location = new Location("SavedLocation");
+        location.setLatitude(lat);
+        location.setLongitude(lon);
+
+        return location;
     }
 
     public void saveUserHistory(Location location){

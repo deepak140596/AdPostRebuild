@@ -22,11 +22,14 @@ public class CalculateDistance {
     }
     public double distanceInKM(double lat1, double long1){
 
+        // get location from shared preference by default
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         double lat2 = sharedPreferences.getFloat("latitude", 0);
         double long2 = sharedPreferences.getFloat("longitude", 0);
 
 
+        // if shared pref is empty , get new location by calling User Location
         if (lat2 == 0 && long2 == 0) {
             UserLocation userLocation = new UserLocation(context);
             LocationManager locationManager = userLocation.getLocationManager();

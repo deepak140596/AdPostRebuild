@@ -7,7 +7,6 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -38,6 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.EventListener;
@@ -100,6 +100,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     // for location and category selection
     RelativeLayout selectCategoryRl, selectLocationRl;
     TextView categorySelectedTv, selectedLocationTv;
+
+    int PLACE_PICKER_REQUEST = 1;
 
 
     @Override
@@ -196,6 +198,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(context, MapsActivity.class));
+
+
             }
         });
     }
