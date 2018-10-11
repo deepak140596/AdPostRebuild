@@ -16,6 +16,7 @@ import android.util.Log;
 
 public class CalculateDistance {
     String TAG = "CALC_DIST";
+    float MAX_RADIUS = 50.0f;
     Context context;
     public CalculateDistance(Context context) {
         this.context = context;
@@ -76,7 +77,7 @@ public class CalculateDistance {
 
         // get distance from SharedPreferences
         // TODO
-        return 5.0;
+        return MAX_RADIUS;
     }
 
 

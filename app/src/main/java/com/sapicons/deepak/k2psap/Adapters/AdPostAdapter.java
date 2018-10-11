@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.R;
 
 import java.text.DecimalFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
     static class ViewHolder{
 
-        TextView titleTv, descriptionTv, priceTv, distanceTv;
+        TextView titleTv, descriptionTv, priceTv, distanceTv, dayTv;
         ImageView coverIv;
         boolean isFavorited=false;
         ImageView favButton,unfavButton;
@@ -82,6 +84,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             holder.priceTv = convertView.findViewById(R.id.item_ad_post_price_tv);
             holder.coverIv = convertView.findViewById(R.id.item_ad_post_imageview);
             holder.distanceTv = convertView.findViewById(R.id.item_ad_post_distance_tv);
+            holder.dayTv = convertView.findViewById(R.id.item_ad_post_day_tv);
 
             holder.position = position;
 
@@ -100,6 +103,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         holder.priceTv.setText(postItem.getPrice());
 
         holder.distanceTv.setText(setDistance(postItem));
+        holder.dayTv.setText(getRelativeTime(Long.parseLong(postItem.getPostId())));
 
         if(!postItem.getImgUrlOne().isEmpty())
             Glide.with(context).load(postItem.getImgUrlOne()).into(holder.coverIv);
@@ -219,6 +223,13 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         return value.format(distance)+" kms away";
 
 
+    }
+
+    public String getRelativeTime(long oldTime){
+
+        long now = Calendar.getInstance().getTimeInMillis();
+        CharSequence ago = DateUtils.getRelativeTimeSpanString(oldTime,now,DateUtils.MINUTE_IN_MILLIS);
+        return ago.toString();
     }
 
 }

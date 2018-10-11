@@ -141,8 +141,9 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.nav_camera -> {
                 // Handle the camera action
             }
-            R.id.nav_gallery -> {
+            R.id.nav_your_posts -> {
 
+                startActivity(Intent(this,YourAdsActivity::class.java))
             }
             R.id.nav_slideshow -> {
 

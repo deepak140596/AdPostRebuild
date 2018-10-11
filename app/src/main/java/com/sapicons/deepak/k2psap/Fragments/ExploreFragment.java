@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -102,6 +103,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     TextView categorySelectedTv, selectedLocationTv;
 
     int PLACE_PICKER_REQUEST = 1;
+    ProgressDialog progressDialog ;
 
 
     @Override
@@ -133,6 +135,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         adListView = view.findViewById(R.id.frag_explore_ads_list_view);
         //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
         mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
+        progressDialog = new ProgressDialog(context);
 
         //mLayoutManager = new LinearLayoutManager(context);
         //adRecyclerView.setLayoutManager(mLayoutManager);
@@ -197,6 +200,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         selectLocationRl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                showProgressDialog("Please Wait ...");
                 startActivity(new Intent(context, MapsActivity.class));
 
 
@@ -264,6 +268,13 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         Log.d("EXP_FRAG","Distance: "+distanceInKMeters);
 
         return calculateDistance.isNearby(distanceInKMeters);
+    }
+
+    public void showProgressDialog(String msg){
+
+        progressDialog.setMessage(msg);
+        progressDialog.show();
+
     }
 
 
@@ -439,6 +450,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public void onResume() {
+        if(progressDialog.isShowing())
+            progressDialog.dismiss();
         listenToChanges();
         super.onResume();
     }

@@ -1,5 +1,6 @@
 package com.sapicons.deepak.k2psap.Activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -30,7 +31,6 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
 
     private GoogleMap mMap;
     private FancyButton saveLocationBtn;
-    Location savedLocation;
 
     String TAG = "MAPS_ACTIVITY";
 
@@ -45,17 +45,12 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);*/
 
-        initialiseViews();
         createPlacePicker();
 
 
 
     }
 
-    public void initialiseViews(){
-        //saveLocationBtn =  findViewById(R.id.activity_maps_save_location_btn);
-        //savedLocation = (new UserLocation(this)).getSavedLocation();
-    }
 
     public void createPlacePicker(){
 
