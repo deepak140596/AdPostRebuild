@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -37,8 +38,13 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.EventListener;
@@ -69,6 +75,8 @@ import java.util.TimerTask;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by Deepak Prasad on 29-09-2018.
  */
@@ -95,7 +103,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     Timer timer;
     final long DELAY_MS = 500;//delay in milliseconds before task is to be executed
     final long PERIOD_MS = 3000; // time in milliseconds between successive task executions.
-    int NUM_PAGES;
+    int NUM_PAGES=0;
+    Handler handler;
+    Runnable Update;
 
 
     // for location and category selection
@@ -126,7 +136,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         //getCategoriesFromDatabase();
         initialiseViews(view);
         setOnClickListeners();
-        listenToChanges();
+        listenToChanges(false);
     }
 
     public void initialiseViews(View view) {
@@ -201,14 +211,15 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             @Override
             public void onClick(View view) {
                 showProgressDialog("Please Wait ...");
-                startActivity(new Intent(context, MapsActivity.class));
+                //startActivity(new Intent(context, MapsActivity.class));
+                createPlacePicker();
 
 
             }
         });
     }
 
-    public void listenToChanges() {
+    public void listenToChanges(final boolean isMapActivityClosed) {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //final CollectionReference docRef = db.collection("users").document(user.getEmail()).collection("");
@@ -238,14 +249,14 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         //adRecyclerView.setAdapter(postItemRAdapter);
 
                         //postItemRAdapter.notifyDataSetChanged();
-                        setUpViewPager();
+                        setUpViewPager(isMapActivityClosed);
                         //progressDialog.dismiss();
 
                     }
                 });
     }
 
-    public void setUpViewPager() {
+    public void setUpViewPager(boolean isMapActivityClosed) {
 
         List<PostItem> newList = nearbyPostList;
         Collections.sort(newList, PostItem.PostTimeComparator);
@@ -255,7 +266,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         AdPostViewPagerAdapter adapter = new AdPostViewPagerAdapter(context, newList);
         mostRecentViewPager.setAdapter(adapter);
 
-        setUpSlideShow();
+        if(!isMapActivityClosed)
+            setUpSlideShow();
     }
 
     public boolean isNearby(PostItem postItem) {
@@ -337,7 +349,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         List<PostItem> filteredValues = new ArrayList<PostItem>(selectedCategoryPostList);
         for (PostItem value : selectedCategoryPostList) {
 
-            String searchString = value.getTitle()+ " " + value.getCategoryName();
+            String searchString = value.getTitle()+ " " + value.getCategoryName()+" "+ value.getDescription();
             searchString=searchString.toLowerCase();
 
             if (!searchString.contains(newText.toLowerCase())) {
@@ -427,13 +439,14 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     public void setUpSlideShow(){
 
-        final Handler handler = new Handler();
-        final Runnable Update = new Runnable() {
+        handler = new Handler();
+        Update = new Runnable() {
             public void run() {
                 if (currentPage == NUM_PAGES) {
                     currentPage = 0;
                 }
-                mostRecentViewPager.setCurrentItem(currentPage++, true);
+                else
+                    mostRecentViewPager.setCurrentItem(currentPage++, true);
             }
         };
 
@@ -452,7 +465,54 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     public void onResume() {
         if(progressDialog.isShowing())
             progressDialog.dismiss();
-        listenToChanges();
+
+        //listenToChanges(true);
         super.onResume();
+    }
+
+
+    public void createPlacePicker(){
+
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+
+        try {
+            Log.d(TAG,"opening startActivityforResult");
+            startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+
+                Place place = PlacePicker.getPlace(data, getActivity());
+                LatLng latLng = place.getLatLng();
+                Log.d(TAG,"LatLng: "+latLng);
+                saveLocation(latLng);
+                String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
+
+                listenToChanges(true);
+            }
+        }
+    }
+
+    private void saveLocation(LatLng latLng){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        float lat = (float)latLng.latitude;
+        float lon = (float)latLng.longitude;
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putFloat("latitude",lat);
+        editor.putFloat("longitude",lon);
+        editor.putBoolean("isLocationManual",true);
+        editor.apply();
+        editor.commit();
+
     }
 }

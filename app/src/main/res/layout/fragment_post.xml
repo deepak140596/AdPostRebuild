@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
     tools:context="com.sapicons.deepak.k2psap.Fragments.PostFragment">
 
 
@@ -130,8 +131,33 @@
 
             </LinearLayout>
 
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="4dp"
+                android:id="@+id/post_select_location_btn"
+                fancy:fb_text= "Choose Location"
+                fancy:fb_focusColor="@color/indigo400"
+                fancy:fb_defaultColor="@color/green800">
+
+            </mehdi.sakout.fancybuttons.FancyButton>
+
+            <com.google.android.gms.maps.MapView
+
+                android:id="@+id/post_map_frag"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"/>
+
         </LinearLayout>
     </ScrollView>
+
 
 
 

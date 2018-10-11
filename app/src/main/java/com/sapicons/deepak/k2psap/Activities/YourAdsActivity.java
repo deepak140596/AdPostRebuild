@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -114,6 +115,19 @@ public class YourAdsActivity extends AppCompatActivity implements SearchView.OnQ
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.collapsed_search_menu,menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        //searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint("Search Your Ads ...");
+        searchView.setOnQueryTextListener(this);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onMenuItemActionExpand(MenuItem menuItem) {
         return false;
     }
@@ -129,7 +143,30 @@ public class YourAdsActivity extends AppCompatActivity implements SearchView.OnQ
     }
 
     @Override
-    public boolean onQueryTextChange(String s) {
+    public boolean onQueryTextChange(String newText) {
+
+        if (newText == null || newText.trim().isEmpty()) {
+            resetSearch();
+            return false;
+        }
+        List<PostItem> filteredValues = new ArrayList<PostItem>(postList);
+        for (PostItem value : postList) {
+
+            String searchString = value.getTitle()+ " " + value.getCategoryName()+" "+ value.getDescription();
+            searchString=searchString.toLowerCase();
+
+            if (!searchString.contains(newText.toLowerCase())) {
+
+                filteredValues.remove(value);
+            }
+        }
+        postItemAdapter = new AdPostAdapter(this, R.layout.item_ad_post, filteredValues);
+        adListView.setAdapter(postItemAdapter);
         return false;
+    }
+
+    public void resetSearch(){
+        postItemAdapter = new AdPostAdapter(this, R.layout.item_ad_post, postList);
+        adListView.setAdapter(postItemAdapter);
     }
 }

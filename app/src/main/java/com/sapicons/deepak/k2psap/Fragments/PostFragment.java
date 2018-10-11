@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -28,8 +29,23 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -57,6 +73,7 @@ import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -70,6 +87,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
 import es.dmoral.toasty.Toasty;
+import mehdi.sakout.fancybuttons.FancyButton;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -77,7 +95,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by Deepak Prasad on 28-09-2018.
  */
 
-public class PostFragment extends Fragment {
+public class PostFragment extends Fragment implements OnMapReadyCallback {
 
     ImageButton imgOneIv, imgTwoIv, imgThreeIv, imgFourIv,imgFiveIv;
     ImageView emptyViewPagerIv;
@@ -87,12 +105,16 @@ public class PostFragment extends Fragment {
     ProgressDialog progressDialog;
     EditText adTitleEt, descriptionEt, priceEt;
     SwitchCompat sharePhoneNumberSwitch;
+    FancyButton selectLocationBtn;
+
 
     Uri imgOneUri, imgTwoUri, imgThreeUri, imgFourUri, imgFiveUri;
     int categoryId ;
     String categoryName;
     String imgOneUrl="", imgTwoUrl="",imgThreeUrl="",imgFourUrl="",imgFiveUrl="";
     String confirmedPhoneNumber = "";
+    float latitude , longitude ;
+    boolean isLocationSetManual = false;
 
     int imgClicked=0;
     int imageUploadCount =0;
@@ -106,6 +128,14 @@ public class PostFragment extends Fragment {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
+    // place picker
+    int PLACE_PICKER_REQUEST = 1;
+
+    // for map
+    GoogleMap googleMap;
+    MapView mapView;
+    Marker marker;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -118,7 +148,13 @@ public class PostFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+
+        MapsInitializer.initialize(this.getActivity());
+        mapView = view.findViewById(R.id.post_map_frag);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
 
         initialiseViews(view);
         //getCategoriesFromDatabase();
@@ -142,6 +178,11 @@ public class PostFragment extends Fragment {
         viewPager= view.findViewById(R.id.post_preview_images_viewpager);
         categorySpinner = view.findViewById(R.id.post_category_spinner);
         sharePhoneNumberSwitch = view.findViewById(R.id.post_share_phone_switch);
+
+        selectLocationBtn = view.findViewById(R.id.post_select_location_btn);
+
+
+
 
 
         list = new ArrayList<>();
@@ -231,6 +272,14 @@ public class PostFragment extends Fragment {
                     askForConfirmationToUploadAd();
             }
         });
+
+
+        selectLocationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createPlacePicker();
+            }
+        });
     }
 
     @Override
@@ -244,6 +293,18 @@ public class PostFragment extends Fragment {
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+            }
+        }
+        else if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+
+                Place place = PlacePicker.getPlace(data, getActivity());
+                LatLng latLng = place.getLatLng();
+                Log.d(TAG,"LatLng: "+latLng);
+                saveLocation(latLng);
+                String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
+
             }
         }
     }
@@ -460,9 +521,12 @@ public class PostFragment extends Fragment {
         }
 
         int category = categoryId;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        float latitude = sharedPreferences.getFloat("latitude",0.0f);
-        float longitude = sharedPreferences.getFloat("longitude",0.0f);
+            if(!isLocationSetManual) {
+                Location location = (new UserLocation(context)).getSavedLocation();
+                latitude = (float)location.getLatitude();
+                longitude = (float)location.getLongitude();
+            }
+
 
         PostItem postItem = new PostItem(postId,email,title,description,price,category,categoryName);
         postItem.setPhoneNumber(phoneNumber);
@@ -667,5 +731,89 @@ public class PostFragment extends Fragment {
         String locale = context.getResources().getConfiguration().locale.getCountry();
         Log.d(TAG,"Country: "+locale);
         return locale;
+    }
+
+    public void createPlacePicker(){
+
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+
+        try {
+            Log.d(TAG,"opening startActivityforResult");
+            startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void saveLocation(LatLng latLng){
+        latitude = (float)latLng.latitude;
+        longitude = (float)latLng.longitude;
+
+        isLocationSetManual = true;
+        mapView.getMapAsync(this);
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+
+
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+
+    @Override
+    public void onMapReady(GoogleMap gMap) {
+        googleMap= gMap;
+        LatLng position;
+        Log.d(TAG,"Inside Map Ready");
+        if(isLocationSetManual)
+            position = new LatLng(latitude,longitude);
+        else{
+            Location location = (new UserLocation(context)).getSavedLocation();
+            position = new LatLng(location.getLatitude(),location.getLongitude());
+        }
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 10);
+        googleMap.animateCamera(cameraUpdate);
+        if(marker != null)
+            marker.remove();
+        marker =googleMap.addMarker(new MarkerOptions().position(position).title("Your location"));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        mapView.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
     }
 }

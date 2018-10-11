@@ -1,9 +1,7 @@
 package com.sapicons.deepak.k2psap.Activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;

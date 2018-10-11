@@ -73,6 +73,8 @@ public class AdPreviewActivity extends AppCompatActivity {
     final long DELAY_MS = 500;//delay in milliseconds before task is to be executed
     final long PERIOD_MS = 3000; // time in milliseconds between successive task executions.
     int NUM_PAGES;
+    Handler handler ;
+    Runnable Update;
 
 
     @Override
@@ -392,8 +394,8 @@ public class AdPreviewActivity extends AppCompatActivity {
     public void setUpSlideShow(){
 
 
-        final Handler handler = new Handler();
-        final Runnable Update = new Runnable() {
+        handler = new Handler();
+        Update = new Runnable() {
             public void run() {
                 if (currentPage == NUM_PAGES) {
                     currentPage = 0;
