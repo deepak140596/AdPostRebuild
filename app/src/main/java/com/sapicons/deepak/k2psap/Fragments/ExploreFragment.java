@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -162,7 +161,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
         nearbyPostList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, nearbyPostList);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
         adListView.setAdapter(postItemAdapter);
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
@@ -190,6 +189,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d(TAG,"Ad Clicked: "+i);
                 Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
                 //Bundle bundle =
                 PostItem item = (PostItem) adapterView.getItemAtPosition(i);
@@ -244,7 +244,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         }
                         nearbyPostList = new_list;
                         selectedCategoryPostList = new_list;
-                        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, nearbyPostList);
+                        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
                         adListView.setAdapter(postItemAdapter);
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);
@@ -360,7 +360,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 filteredValues.remove(value);
             }
         }
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, filteredValues);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, filteredValues);
         adListView.setAdapter(postItemAdapter);
 
         return false;
@@ -379,7 +379,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 selectedCategoryPostList.remove(item);
         }
 
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, selectedCategoryPostList);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, selectedCategoryPostList);
         adListView.setAdapter(postItemAdapter);
     }
 
@@ -388,7 +388,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     public void resetSearch(){
 
         mostRecentViewPager.setVisibility(View.VISIBLE);
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, selectedCategoryPostList);
+        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, selectedCategoryPostList);
         adListView.setAdapter(postItemAdapter);
     }
 
@@ -496,6 +496,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 Place place = PlacePicker.getPlace(data, getActivity());
                 LatLng latLng = place.getLatLng();
                 Log.d(TAG,"LatLng: "+latLng);
+
+
                 saveLocation(latLng);
                 String toastMsg = String.format("Place: %s", place.getName());
                 Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
@@ -506,16 +508,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     private void saveLocation(LatLng latLng){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        float lat = (float)latLng.latitude;
-        float lon = (float)latLng.longitude;
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat("latitude",lat);
-        editor.putFloat("longitude",lon);
-        editor.putBoolean("isLocationManual",true);
-        editor.apply();
-        editor.commit();
+        UserLocation userLocation = new UserLocation(context);
+        userLocation.saveLocationToSharedPreferences(latLng);
 
     }
 }

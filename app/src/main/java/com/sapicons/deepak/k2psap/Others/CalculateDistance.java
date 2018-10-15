@@ -76,8 +76,13 @@ public class CalculateDistance {
     public double getRadiusInKM(){
 
         // get distance from SharedPreferences
-        // TODO
-        return MAX_RADIUS;
+        //
+        float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance",10.0f);
+        radius *= 10;
+        radius  = (float)Math.ceil(radius);
+        radius *= 10;
+        Log.d(TAG,"Radius: "+radius);
+        return radius;
     }
 
 

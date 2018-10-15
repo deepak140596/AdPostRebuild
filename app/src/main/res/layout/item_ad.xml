@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="4dp"
+    android:clipToPadding="false"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fancy="http://schemas.android.com/tools">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="4dp"
+        android:elevation="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/item_ad_header_ll"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/item_ad_user_pic_iv"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/placeholder_profile"
+                    android:layout_centerVertical="true"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/item_ad_distance_ll"
+                    android:orientation="vertical"
+                    android:layout_toRightOf="@+id/item_ad_user_pic_iv">
+
+                    <TextView
+                        android:id="@+id/item_ad_title_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:text="Nokia 5.1 Plus"/>
+
+                    <TextView
+                        android:id="@+id/item_ad_price_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:text="6000"/>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/item_ad_distance_ll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/item_ad_days_posted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/green800"
+                        android:textAlignment="textEnd"
+                        android:textSize="12dp"
+                        android:text="4 days ago"/>
+                    <TextView
+                        android:id="@+id/item_ad_distance_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="textEnd"
+                        android:textSize="12dp"
+                        android:text="4.7 kms away"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+            <ImageView
+                android:id="@+id/item_ad_cover_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:layout_below="@+id/item_ad_header_ll"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/black_gradient">
+
+               <ImageButton
+                   android:id="@+id/item_ad_chat_iv"
+                   android:layout_width="25dp"
+                   android:layout_height="25dp"
+                   android:layout_marginLeft="32dp"
+                   android:layout_alignParentStart="true"
+                   android:layout_centerVertical="true"
+                   android:background="@mipmap/ic_chat_white"
+                   android:visibility="gone"/>
+                <ImageButton
+                    android:id="@+id/item_ad_call_iv"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_centerInParent="true"
+                    android:background="@mipmap/ic_phone_white"
+                    android:visibility="gone"/>
+                <ImageButton
+                    android:id="@+id/item_ad_favorite_iv"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@mipmap/ic_favorites_border_white"/>
+
+                <ImageButton
+                    android:id="@+id/item_ad_unfavorite_iv"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone"
+                    android:background="@mipmap/ic_favorites_white"/>
+
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+
+
+</RelativeLayout>

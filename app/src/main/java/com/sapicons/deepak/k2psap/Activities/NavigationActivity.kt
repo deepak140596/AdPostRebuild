@@ -19,7 +19,9 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ProgressBar
+import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -38,6 +40,8 @@ import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.content_navigation.*
+import kotlinx.android.synthetic.main.nav_header_navigation.*
+import kotlinx.android.synthetic.main.nav_header_navigation.view.*
 import java.util.ArrayList
 
 class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -45,6 +49,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     var auth: FirebaseAuth ?=null
     private var doubleBackToExit = false
     lateinit var locationManager : LocationManager
+    var isPermissionAcquired = false
 
     //var categoryList: MutableList<CategoryItem> = ArrayList()
     var TAG = "NAV_ACTIVITY"
@@ -68,6 +73,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         //set side navigation bar
         nav_view.setNavigationItemSelectedListener(this)
+        setUpNavigationBar()
+
         //set bottom navigation bar
         bottom_navigation_bar.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener)
 
@@ -79,11 +86,13 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         askForPermissions()
 
         // get local categories
-        getCategoriesFromDatabase()
+        //getCategoriesFromDatabase()
 
 
         //start explore fragment
         //startExploreFragment()
+
+        content_nav_request_permission_btn.setOnClickListener({askForPermissions()})
 
 
     }
@@ -137,18 +146,18 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     // side navigation bar
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
+
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
+
             R.id.nav_your_posts -> {
 
+                if(isPermissionAcquired)
                 startActivity(Intent(this,YourAdsActivity::class.java))
             }
-            R.id.nav_slideshow -> {
 
-            }
-            R.id.nav_manage -> {
+            R.id.nav_settings -> {
+                if(isPermissionAcquired)
+                    startActivity(Intent(this,SettingsActivity::class.java))
 
             }
             R.id.nav_share -> {
@@ -170,29 +179,33 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private val mOnBottomNavigationItemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener =
             BottomNavigationView.OnNavigationItemSelectedListener{ item ->
-                var fragment : Fragment? = ExploreFragment()
-                var fragTags =""
-                when(item.itemId){
-                    R.id.bottom_navigation_home ->{
-                        fragment = ExploreFragment()
+                if(isPermissionAcquired) {
+                    var fragment: Fragment? = ExploreFragment()
+                    var fragTags = ""
+
+                    when (item.itemId) {
+                        R.id.bottom_navigation_home -> {
+                            fragment = ExploreFragment()
+
+                        }
+                        R.id.bottom_navigation_post -> {
+                            fragment = PostFragment()
+                        }
+                        R.id.bottom_navigation_favorites -> {
+                            fragment = FavoritesFragment()
+                        }
+                        R.id.bottom_navigation_chat -> {
+                            fragment = ChatsFragment()
+
+                        }
 
                     }
-                    R.id.bottom_navigation_post ->{
-                        fragment = PostFragment()
-                    }
-                    R.id.bottom_navigation_favorites -> {
-                        fragment = FavoritesFragment()
-                    }
-                    R.id.bottom_navigation_chat -> {
-                        fragment = ChatsFragment()
 
-                    }
+                    var fragmentManager = fragmentManager
+                    fragmentManager.beginTransaction().replace(R.id.navigation_activity_content_frame, fragment, fragTags).commit()
 
+                    true
                 }
-
-                var fragmentManager = fragmentManager
-                fragmentManager.beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,fragTags).commit()
-
                 true
             }
 
@@ -263,11 +276,18 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     // permission was granted
 
+                    isPermissionAcquired = true
+
+                    //set grant access button invisible
+                    content_nav_request_permission_btn.visibility = View.GONE
                     // get the user's location
                     getUserLocation()
+                    getCategoriesFromDatabase()
                 }
                 else{
                     // permission was denied
+                    isPermissionAcquired = false
+                    content_nav_request_permission_btn.visibility = View.VISIBLE
                     Toasty.error(this,"Permission Denied").show()
                     // set empty list view
                 }
@@ -305,7 +325,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
                     // save categories to database
 
-                    //start Fragments
+                    // start explore fragment after checking for location permissions
+
                     startExploreFragment()
                 })
     }
@@ -317,6 +338,24 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         editor.putBoolean("isLocationManual",isLocationManual)
         editor.apply()
         editor.commit()
+    }
+
+
+    fun setUpNavigationBar(){
+        var view = nav_view.getHeaderView(0)
+
+        var user = FirebaseAuth.getInstance().currentUser
+        if(user!=null){
+            //Log.d(TAG,"Name: "+user.displayName)
+            view.nav_header_display_name_tv.setText(user.displayName)
+            view.nav_header_email_tv.setText(user.email)
+            var picUrl = user.photoUrl
+            if(picUrl != null){
+                Glide.with(this).load(picUrl).into(view.nav_header_profile_pic_iv)
+            }else{
+                Glide.with(this).load(getDrawable(R.drawable.placeholder_profile)).into(view.nav_header_profile_pic_iv)
+            }
+        }
     }
 
 }

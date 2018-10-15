@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -89,6 +90,17 @@ public class UserLocation {
 
         editor.putFloat("latitude",(float)location.getLatitude());
         editor.putFloat("longitude",(float)location.getLongitude());
+        editor.apply();
+        editor.commit();
+
+    }
+    public void saveLocationToSharedPreferences(LatLng latLng){
+        Log.d("LOCATION","Location: "+latLng);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor= sharedPreferences.edit();
+
+        editor.putFloat("latitude",(float)latLng.latitude);
+        editor.putFloat("longitude",(float)latLng.longitude);
         editor.apply();
         editor.commit();
 

@@ -55,6 +55,14 @@
             android:name=".Activities.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".Activities.YourAdsActivity"></activity>
+
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:parentActivityName=".Activities.NavigationActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activities.NavigationActivity" />
+        </activity>
     </application>
 
 </manifest>

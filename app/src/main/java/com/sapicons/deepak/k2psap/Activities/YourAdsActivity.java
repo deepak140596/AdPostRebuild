@@ -57,7 +57,7 @@ public class YourAdsActivity extends AppCompatActivity implements SearchView.OnQ
         adListView =findViewById(R.id.activity_your_ads_listview);
 
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(this,R.layout.item_ad_post,postList);
+        postItemAdapter = new AdPostAdapter(this,R.layout.item_ad,postList);
         adListView.setAdapter(postItemAdapter);
 
         progressDialog = new ProgressDialog(this);

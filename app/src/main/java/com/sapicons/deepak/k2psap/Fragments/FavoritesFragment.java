@@ -76,7 +76,7 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
 
 
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
+        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
         adListView.setAdapter(postItemAdapter);
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
@@ -137,7 +137,7 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
 
                         }
                         postList = new_list;
-                        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
+                        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
                         adListView.setAdapter(postItemAdapter);
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);

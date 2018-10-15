@@ -36,6 +36,7 @@ import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
+import com.sapicons.deepak.k2psap.Objects.User;
 import com.sapicons.deepak.k2psap.Others.CalculateDistance;
 import com.sapicons.deepak.k2psap.R;
 

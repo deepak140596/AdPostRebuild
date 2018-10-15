@@ -1,8 +1,6 @@
 package com.sapicons.deepak.k2psap.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +17,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sapicons.deepak.k2psap.Objects.User;
 import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
 
@@ -102,7 +101,11 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
     }
 
     private void saveLocation(LatLng latLng){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        UserLocation userLocation = new UserLocation(this);
+        userLocation.saveLocationToSharedPreferences(latLng);
+
+        /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         float lat = (float)latLng.latitude;
         float lon = (float)latLng.longitude;
 
@@ -113,7 +116,7 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
         editor.apply();
         editor.commit();
 
-        finish();
+        finish();*/
     }
 
 

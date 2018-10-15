@@ -3,6 +3,7 @@ package com.sapicons.deepak.k2psap.Adapters;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -61,9 +63,10 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
     static class ViewHolder{
 
         TextView titleTv, descriptionTv, priceTv, distanceTv, dayTv;
-        ImageView coverIv;
+        ImageView coverIv, userPostedPicIv;
         boolean isFavorited=false;
         ImageView favButton,unfavButton;
+        ImageButton favBtn, unfavBtn, chatBtn, callBtn;
         int position;
     }
 
@@ -74,17 +77,25 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
         final ViewHolder holder;
         if(convertView == null){
-            convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.item_ad_post, parent, false);
+            convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.item_ad, parent, false);
 
             holder = new ViewHolder();
-            holder.titleTv = convertView.findViewById(R.id.item_ad_post_title_tv);
+            /*holder.titleTv = convertView.findViewById(R.id.item_ad_post_title_tv);
             holder.favButton = convertView.findViewById(R.id.item_ad_post_fav);
             holder.unfavButton = convertView.findViewById(R.id.item_ad_post_unfav);
             holder.descriptionTv = convertView.findViewById(R.id.item_ad_post_description_tv);
             holder.priceTv = convertView.findViewById(R.id.item_ad_post_price_tv);
             holder.coverIv = convertView.findViewById(R.id.item_ad_post_imageview);
             holder.distanceTv = convertView.findViewById(R.id.item_ad_post_distance_tv);
-            holder.dayTv = convertView.findViewById(R.id.item_ad_post_day_tv);
+            holder.dayTv = convertView.findViewById(R.id.item_ad_post_day_tv);*/
+
+            holder.titleTv = convertView.findViewById(R.id.item_ad_title_tv);
+            holder.favBtn = convertView.findViewById(R.id.item_ad_favorite_iv);
+            holder.unfavBtn = convertView.findViewById(R.id.item_ad_unfavorite_iv);
+            holder.priceTv = convertView.findViewById(R.id.item_ad_price_tv);
+            holder.coverIv = convertView.findViewById(R.id.item_ad_cover_iv);
+            holder.distanceTv = convertView.findViewById(R.id.item_ad_distance_tv);
+            holder.dayTv = convertView.findViewById(R.id.item_ad_days_posted);
 
             holder.position = position;
 
@@ -99,7 +110,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         final PostItem postItem =getItem(position);
 
         holder.titleTv.setText(postItem.getTitle());
-        holder.descriptionTv.setText(postItem.getDescription());
+        //holder.descriptionTv.setText(postItem.getDescription());
         holder.priceTv.setText(postItem.getPrice());
 
         holder.distanceTv.setText(setDistance(postItem));
@@ -111,11 +122,10 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             holder.coverIv.setImageResource(R.mipmap.ic_android_icon);
 
 
-
         // set if the ad is favorited or not
         setFavButton(holder,postItem);
 
-       holder.favButton.setOnClickListener(new View.OnClickListener() {
+       holder.favBtn.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
 
@@ -124,7 +134,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
            }
        });
 
-        holder.unfavButton.setOnClickListener(new View.OnClickListener() {
+        holder.unfavBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -132,6 +142,28 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
                 removePostFromFavList(holder,postItem);
             }
         });
+
+        holder.coverIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d(TAG,"Ad Clicked: "+position);
+                Intent intent = new Intent(context, AdPreviewActivity.class);
+                //Bundle bundle =
+
+                intent.putExtra("selected_post_item", postItem);
+                context.startActivity(intent);
+            }
+        });
+
+        holder.chatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
 
         return  convertView;
     }
@@ -152,13 +184,13 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
                     if(documentSnapshot.exists()){
 
 
-                        holder.favButton.setVisibility(View.GONE);
-                        holder.unfavButton.setVisibility(View.VISIBLE);
+                        holder.favBtn.setVisibility(View.GONE);
+                        holder.unfavBtn.setVisibility(View.VISIBLE);
                     }else{
                         //no such doc exits
                         Log.d(TAG,"No such doc exits!");
-                        holder.unfavButton.setVisibility(View.GONE);
-                        holder.favButton.setVisibility(View.VISIBLE);
+                        holder.unfavBtn.setVisibility(View.GONE);
+                        holder.favBtn.setVisibility(View.VISIBLE);
                     }
                 }else{
                     Log.d(TAG,"Error getting document!");
