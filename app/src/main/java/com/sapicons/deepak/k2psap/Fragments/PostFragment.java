@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -96,7 +97,7 @@ import static android.app.Activity.RESULT_OK;
 public class PostFragment extends Fragment implements OnMapReadyCallback {
 
     ImageButton imgOneIv, imgTwoIv, imgThreeIv, imgFourIv,imgFiveIv;
-    ImageView emptyViewPagerIv;
+    //ImageView emptyViewPagerIv;
     ViewPager viewPager;
     FloatingActionButton doneBtn;
     Spinner categorySpinner;
@@ -104,6 +105,7 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
     EditText adTitleEt, descriptionEt, priceEt;
     SwitchCompat sharePhoneNumberSwitch;
     FancyButton selectLocationBtn;
+    TextView emptyPicsTV;
 
 
     Uri imgOneUri, imgTwoUri, imgThreeUri, imgFourUri, imgFiveUri;
@@ -166,7 +168,7 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
         imgThreeIv = view.findViewById(R.id.post_image_three_ib);
         imgFourIv = view.findViewById(R.id.post_image_four_ib);
         imgFiveIv = view.findViewById(R.id.post_image_five_ib);
-        emptyViewPagerIv = view.findViewById(R.id.post_empty_view_pager_iv);
+        //emptyViewPagerIv = view.findViewById(R.id.post_empty_view_pager_iv);
 
         adTitleEt = view.findViewById(R.id.post_title_et);
         descriptionEt = view.findViewById(R.id.post_description_et);
@@ -178,6 +180,7 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
         sharePhoneNumberSwitch = view.findViewById(R.id.post_share_phone_switch);
 
         selectLocationBtn = view.findViewById(R.id.post_select_location_btn);
+        emptyPicsTV = view.findViewById(R.id.post_empty_textview);
 
 
 
@@ -335,7 +338,8 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
 
     public void setUpViewPager(){
 
-        emptyViewPagerIv.setVisibility(View.GONE);
+        //emptyViewPagerIv.setVisibility(View.GONE);
+        emptyPicsTV.setVisibility(View.GONE);
         list = new ArrayList<>();
         if(imgOneUri != null)
             list.add(imgOneUri);
@@ -526,7 +530,9 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
             }
 
 
-        PostItem postItem = new PostItem(postId,email,title,description,price,category,categoryName);
+        PostItem postItem = new PostItem(postId,email,title,description,price,
+                category,categoryName,user.getDisplayName(),user.getPhotoUrl().toString());
+
         postItem.setPhoneNumber(phoneNumber);
         postItem.setLatitude(latitude);
         postItem.setLongitude(longitude);
@@ -584,7 +590,8 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
             list = null;
 
             setUpViewPager();
-            emptyViewPagerIv.setVisibility(View.VISIBLE);
+            //emptyViewPagerIv.setVisibility(View.VISIBLE);
+            emptyPicsTV.setVisibility(View.VISIBLE);
 
             Fragment fragment = new ExploreFragment();
             getActivity().getFragmentManager().beginTransaction().replace(R.id.navigation_activity_content_frame, fragment, "").commit();

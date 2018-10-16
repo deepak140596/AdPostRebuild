@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -56,8 +57,9 @@ public class AdPreviewActivity extends AppCompatActivity {
 
     PostItem postItem;
     ViewPager viewPager;
-    ImageView emptyViewPagerIv;
-    TextView titleTv, datePostedTv, descriptionTv, priceTv, distanceTv, categoryTv;
+    ImageView emptyViewPagerIv, postUserIv;
+    TextView titleTv, datePostedTv, descriptionTv, priceTv, distanceTv, categoryTv, swipeInstructionTv;
+    TextView postUserNameTv, locationNameTv;
     FancyButton callBtn, messageBtn;
     LinearLayout contactLL;
     RelativeLayout closeRl;
@@ -110,6 +112,13 @@ public class AdPreviewActivity extends AppCompatActivity {
         closeRl = findViewById(R.id.ad_preview_close_post_rl);
         addRemFavBtn = findViewById(R.id.ad_preview_set_rem_fav_fab);
 
+        swipeInstructionTv = findViewById(R.id.ad_preview_swipe_instruction_tv);
+        postUserIv = findViewById(R.id.ad_preview_user_iv);
+        postUserNameTv = findViewById(R.id.ad_preview_user_name_tv);
+        locationNameTv = findViewById(R.id.ad_preview_location_name_tv);
+
+
+
 
         progressDialog = new ProgressDialog(this);
 
@@ -122,7 +131,8 @@ public class AdPreviewActivity extends AppCompatActivity {
         distanceTv.setText(setDistance(postItem));
 
         // set category
-        getCategoriesFromDatabase(postItem.getCategory());
+        //getCategoriesFromDatabase(postItem.getCategory());
+        categoryTv.setText(postItem.getCategoryName());
 
 
         // hide call button if phone number not provided
@@ -138,12 +148,18 @@ public class AdPreviewActivity extends AppCompatActivity {
         // setup posted date
         setUpDate();
 
-        // setup distance
+        // setup post user name
+        if(postItem.getPostUserName()!=null)
+            postUserNameTv.setText(postItem.getPostUserName());
+        // setup post user image
+        if(postItem.getPostUserPicUrl()!=null)
+            Glide.with(this).load(postItem.getPostUserPicUrl()).into(postUserIv);
+
 
         // setup close post feature
 
 
-        // setup contact
+
         // setup chat
         messageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,6 +242,9 @@ public class AdPreviewActivity extends AppCompatActivity {
         PhotoPreviewPagerAdapter adapter = new PhotoPreviewPagerAdapter(this,list);
         viewPager.setAdapter(adapter);
         NUM_PAGES = list.size();
+        if(NUM_PAGES < 2)
+            swipeInstructionTv.setVisibility(View.GONE);
+        else swipeInstructionTv.setVisibility(View.VISIBLE);
 
         setUpSlideShow();
     }

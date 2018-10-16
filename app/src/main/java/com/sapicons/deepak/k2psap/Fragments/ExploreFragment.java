@@ -243,6 +243,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                         }
                         nearbyPostList = new_list;
+                        Collections.sort(nearbyPostList,PostItem.PostTimeComparator);
                         selectedCategoryPostList = new_list;
                         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
                         adListView.setAdapter(postItemAdapter);
@@ -250,7 +251,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         //adRecyclerView.setAdapter(postItemRAdapter);
 
                         //postItemRAdapter.notifyDataSetChanged();
-                        setUpViewPager(isMapActivityClosed);
+                        //setUpViewPager(isMapActivityClosed);
                         //progressDialog.dismiss();
 
                     }

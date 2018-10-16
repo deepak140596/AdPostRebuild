@@ -96,6 +96,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             holder.coverIv = convertView.findViewById(R.id.item_ad_cover_iv);
             holder.distanceTv = convertView.findViewById(R.id.item_ad_distance_tv);
             holder.dayTv = convertView.findViewById(R.id.item_ad_days_posted);
+            holder.userPostedPicIv = convertView.findViewById(R.id.item_ad_user_pic_iv);
 
             holder.position = position;
 
@@ -120,6 +121,11 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             Glide.with(context).load(postItem.getImgUrlOne()).into(holder.coverIv);
         else
             holder.coverIv.setImageResource(R.mipmap.ic_android_icon);
+
+        if(postItem.getPostUserPicUrl() !=null)
+            Glide.with(context).load(postItem.getPostUserPicUrl()).into(holder.userPostedPicIv);
+        else
+            holder.userPostedPicIv.setImageResource(R.drawable.placeholder_profile);
 
 
         // set if the ad is favorited or not
@@ -156,12 +162,6 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             }
         });
 
-        holder.chatBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
 
 
 

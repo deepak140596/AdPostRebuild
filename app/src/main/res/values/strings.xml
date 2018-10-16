@@ -58,4 +58,5 @@
     </string-array>
     <item name="slider_default" format="float" type="string">0.1</item>
     <string name="slider_message">Select Range</string>
+    <string name="swipe_instruction"><![CDATA[<   SWIPE   >]]></string>
 </resources>

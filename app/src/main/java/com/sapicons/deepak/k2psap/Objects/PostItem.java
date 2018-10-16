@@ -12,6 +12,7 @@ public class PostItem implements Serializable {
     String postId, emailId, phoneNumber, title, description, price;
     int category;
     String imgUrlOne, imgUrlTwo, imgUrlThree, imgUrlFour, imgUrlFive;
+    String postUserPicUrl, postUserName;
     String status;
     String categoryName;
 
@@ -20,7 +21,8 @@ public class PostItem implements Serializable {
     public PostItem(){ }
 
 
-    public PostItem(String postId, String emailId, String title, String description, String price, int category, String categoryName){
+    public PostItem(String postId, String emailId, String title, String description, String price,
+                    int category, String categoryName, String postUserName, String postUserPicUrl){
 
         this.postId = postId;
         this.emailId = emailId;
@@ -29,6 +31,8 @@ public class PostItem implements Serializable {
         this.price = price;
         this.category = category;
         this.categoryName = categoryName;
+        this.postUserName = postUserName;
+        this.postUserPicUrl = postUserPicUrl;
 
         this.phoneNumber= "";
         this.imgUrlFive = "";
@@ -171,6 +175,22 @@ public class PostItem implements Serializable {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public String getPostUserPicUrl() {
+        return postUserPicUrl;
+    }
+
+    public void setPostUserPicUrl(String postUserPicUrl) {
+        this.postUserPicUrl = postUserPicUrl;
+    }
+
+    public String getPostUserName() {
+        return postUserName;
+    }
+
+    public void setPostUserName(String postUserName) {
+        this.postUserName = postUserName;
     }
 
     public static Comparator<PostItem> PostTimeComparator = new Comparator<PostItem>() {
