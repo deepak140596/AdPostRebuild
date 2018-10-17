@@ -1,6 +1,7 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -61,6 +63,7 @@ import com.sapicons.deepak.k2psap.Adapters.CategoryAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.Others.CalculateDistance;
+import com.sapicons.deepak.k2psap.Others.OnScrollObserver;
 import com.sapicons.deepak.k2psap.Others.RecyclerViewTouchListener;
 import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
@@ -84,6 +87,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     String TAG = "EXP_FRAG";
 
     ListView adListView;
+    LinearLayout filterAndLocationLL;
+
     //RecyclerView adRecyclerView;
     ViewPager mostRecentViewPager;
     List<PostItem> nearbyPostList;
@@ -126,8 +131,15 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         //adListView = view.findViewById(R.id.frag_explore_ads_list_view);
 
         context = getActivity();
+        //getActivity().getTheme().applyStyle(R.style.CustomTheme, true);
+
+        //getActivity().getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        //getActivity().getActionBar().setDisplayShowCustomEnabled(true);
+        //getActivity().getActionBar().setCustomView(R.layout.custom_app_bar_layout);
+        //View appBarView = getActivity().getActionBar().getCustomView();
         return view;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -135,6 +147,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         //getCategoriesFromDatabase();
         initialiseViews(view);
         setOnClickListeners();
+        setAddress();
         listenToChanges(false);
     }
 
@@ -157,12 +170,50 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         selectCategoryRl = view.findViewById(R.id.frag_explore_select_category_rl);
         selectLocationRl = view.findViewById(R.id.frag_explore_select_location_rl);
         categorySelectedTv = view.findViewById(R.id.frag_explore_category_selected_tv);
-        selectedLocationTv = view.findViewById(R.id.frag_explore_location_tv);
+        selectedLocationTv = view.findViewById(R.id.frag_explore_address_tv);
+
+        filterAndLocationLL = view.findViewById(R.id.frag_explore_filter_ll);
 
 
         nearbyPostList = new ArrayList<>();
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
         adListView.setAdapter(postItemAdapter);
+
+
+
+
+
+    }
+
+    public void setOnClickListeners(){
+
+        adListView.setOnScrollListener(new OnScrollObserver() {
+            @Override
+            public void onScrollUp() {
+                Log.d(TAG,"Scroll Up");
+
+                filterAndLocationLL.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onScrollDown() {
+
+                Log.d(TAG,"Scroll Down");
+                filterAndLocationLL.setVisibility(View.GONE);
+            }
+        });
+
+        adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d(TAG,"Ad Clicked: "+i);
+                Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
+                //Bundle bundle =
+                PostItem item = (PostItem) adapterView.getItemAtPosition(i);
+                intent.putExtra("selected_post_item", item);
+                startActivity(intent);
+            }
+        });
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
                 , adRecyclerView, new RecyclerViewTouchListener.ClickListener() {
@@ -180,23 +231,6 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
             }
         }));*/
-
-
-
-    }
-
-    public void setOnClickListeners(){
-        adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d(TAG,"Ad Clicked: "+i);
-                Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
-                //Bundle bundle =
-                PostItem item = (PostItem) adapterView.getItemAtPosition(i);
-                intent.putExtra("selected_post_item", item);
-                startActivity(intent);
-            }
-        });
 
 
         selectCategoryRl.setOnClickListener(new View.OnClickListener() {
@@ -500,10 +534,12 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
                 saveLocation(latLng);
+
                 String toastMsg = String.format("Place: %s", place.getName());
                 Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
 
                 listenToChanges(true);
+                setAddress();
             }
         }
     }
@@ -513,5 +549,12 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         UserLocation userLocation = new UserLocation(context);
         userLocation.saveLocationToSharedPreferences(latLng);
 
+    }
+
+    private void setAddress(){
+        UserLocation userLocation = new UserLocation(context);
+        Location location = userLocation.getSavedLocation();
+        String address = userLocation.getAddress(location.getLatitude(),location.getLongitude());
+        selectedLocationTv.setText(address);
     }
 }

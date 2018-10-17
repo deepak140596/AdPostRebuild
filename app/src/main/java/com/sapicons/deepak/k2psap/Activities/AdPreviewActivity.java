@@ -2,6 +2,8 @@ package com.sapicons.deepak.k2psap.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -15,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,13 +42,16 @@ import com.sapicons.deepak.k2psap.Objects.ChatItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.Objects.User;
 import com.sapicons.deepak.k2psap.Others.CalculateDistance;
+import com.sapicons.deepak.k2psap.Others.UserLocation;
 import com.sapicons.deepak.k2psap.R;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -154,6 +160,9 @@ public class AdPreviewActivity extends AppCompatActivity {
         // setup post user image
         if(postItem.getPostUserPicUrl()!=null)
             Glide.with(this).load(postItem.getPostUserPicUrl()).into(postUserIv);
+
+        // setup location name
+        setupLocationName();
 
 
         // setup close post feature
@@ -321,7 +330,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     }
 
     public void setUpFavButton(){
-        showProgressDialog("Please Wait ...");
+        //showProgressDialog("Please Wait ...");
         DocumentReference favRef = FirebaseFirestore.getInstance()
                 .collection("favorites")
                 .document(user.getEmail())
@@ -331,7 +340,7 @@ public class AdPreviewActivity extends AppCompatActivity {
         favRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
                 if(task.isSuccessful()){
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if(documentSnapshot.exists()){
@@ -433,4 +442,11 @@ public class AdPreviewActivity extends AppCompatActivity {
             }
         }, DELAY_MS, PERIOD_MS);
     }
+
+    public void setupLocationName(){
+        UserLocation userLocation = new UserLocation(this);
+        String address = userLocation.getAddress(postItem.getLatitude(),postItem.getLongitude());
+        locationNameTv.setText(address);
+    }
+
 }

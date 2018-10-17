@@ -14,13 +14,14 @@
             android:visibility="gone"/>
         
         <LinearLayout
+            android:id="@+id/frag_explore_filter_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp">
+            android:paddingTop="4dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="8dp">
 
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -29,18 +30,30 @@
                     android:layout_height="wrap_content">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
                             android:layout_marginRight="8dp"
-                            android:src="@mipmap/ic_location_black"
+                            android:layout_centerVertical="true"
+                            android:src="@mipmap/ic_send_location"
                             android:id="@+id/frag_explore_location_icon"/>
                         <TextView
+                            android:id="@+id/frag_explore_change_location_tv"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
                             android:layout_toRightOf="@id/frag_explore_location_icon"
-                            android:text="Your Location"
-                            android:id="@+id/frag_explore_location_tv"/>
+                            android:text="Change"
+                            android:textSize="10sp"
+
+                            android:textColor="@color/blue"/>
+                        <TextView
+                            android:id="@+id/frag_explore_address_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/frag_explore_change_location_tv"
+                            android:layout_toRightOf="@id/frag_explore_location_icon"
+                            android:textColor="@color/black"
+                            android:lines="2"
+                            android:textSize="12sp"/>
 
                 </RelativeLayout>
 
@@ -65,7 +78,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:textColor="#2e7d32"
+                            android:textColor="@color/blue"
                             android:text="Cars and Bikes" />
 
                 </RelativeLayout>

@@ -2,7 +2,9 @@ package com.sapicons.deepak.k2psap.Activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActionBar
 import android.app.Fragment
+import android.app.PendingIntent.getActivity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -211,6 +213,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
 
     private fun startExploreFragment(){
+
+
         var fragment = ExploreFragment()
         var fragmentManager = fragmentManager
         fragmentManager.beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,"").commit()

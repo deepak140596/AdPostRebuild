@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.Location;
@@ -13,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -21,8 +24,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -139,5 +145,37 @@ public class UserLocation {
                 Log.d("LOCATION","Failed to update user location to database ");
             }
         });
+    }
+
+
+    public String getAddress(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj = addresses.get(0);
+            String add = obj.getThoroughfare();
+            //add = add + "\n" + obj.getCountryName();
+            //add = add + "\n" + obj.getCountryCode();
+            //add = add + "\n" + obj.getAdminArea();
+            //add = add + "\n" + obj.getPostalCode();
+            add = add + ", " + obj.getSubLocality();
+            add = add + ", " + obj.getSubAdminArea();
+            //add = add + "\n" + obj.getLocality();
+            //add = add + "\n" + obj.getSubThoroughfare();
+            //add= add+ "\n" +
+
+
+            Log.v("IGA", "Address" + add);
+            // Toast.makeText(this, "Address=>" + add,
+            // Toast.LENGTH_SHORT).show();
+
+            // TennisAppActivity.showDialog(add);
+            return add;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return "";
     }
 }

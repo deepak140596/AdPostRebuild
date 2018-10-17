@@ -104,7 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
-                        android:textColor="#0d47a1"
+                        android:textColor="@color/blue"
                         android:text="INR 49,000 "/>
                     <TextView
                         android:id="@+id/ad_preview_title_tv"
