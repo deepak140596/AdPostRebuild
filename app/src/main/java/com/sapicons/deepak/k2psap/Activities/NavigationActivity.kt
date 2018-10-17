@@ -157,6 +157,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 startActivity(Intent(this,YourAdsActivity::class.java))
             }
 
+            R.id.nav_profile_view -> {
+                startActivity(Intent(this,ProfileView::class.java))
+            }
+
             R.id.nav_settings -> {
                 if(isPermissionAcquired)
                     startActivity(Intent(this,SettingsActivity::class.java))
@@ -360,6 +364,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 Glide.with(this).load(getDrawable(R.drawable.placeholder_profile)).into(view.nav_header_profile_pic_iv)
             }
         }
+
+        view.setOnClickListener({
+            startActivity(Intent(this,ProfileView::class.java))
+        })
     }
 
 }
