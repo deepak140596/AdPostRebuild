@@ -26,6 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -105,7 +107,8 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
     EditText adTitleEt, descriptionEt, priceEt;
     SwitchCompat sharePhoneNumberSwitch;
     FancyButton selectLocationBtn;
-    TextView emptyPicsTV;
+    TextView emptyPicsTV, selectedAddressTv;
+    RelativeLayout changeLocationLL;
 
 
     Uri imgOneUri, imgTwoUri, imgThreeUri, imgFourUri, imgFiveUri;
@@ -151,10 +154,12 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
 
+        /*
         MapsInitializer.initialize(this.getActivity());
         mapView = view.findViewById(R.id.post_map_frag);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        */
 
         initialiseViews(view);
         //getCategoriesFromDatabase();
@@ -182,6 +187,9 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
         selectLocationBtn = view.findViewById(R.id.post_select_location_btn);
         emptyPicsTV = view.findViewById(R.id.post_empty_textview);
 
+        selectedAddressTv = view.findViewById(R.id.frag_post_address_tv);
+        changeLocationLL = view.findViewById(R.id.frag_post_select_location_rl);
+
 
 
 
@@ -193,7 +201,9 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
 
         setOnClickListeners();
 
-        initialiseMCallbacks();
+        setAddress(null);
+
+        //initialiseMCallbacks();
 
         // set switch listener
 
@@ -281,6 +291,13 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
                 createPlacePicker();
             }
         });
+
+        changeLocationLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createPlacePicker();
+            }
+        });
     }
 
     @Override
@@ -305,6 +322,7 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
                 saveLocation(latLng);
                 String toastMsg = String.format("Place: %s", place.getName());
                 Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
+                setAddress(latLng);
 
             }
         }
@@ -759,12 +777,25 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
         longitude = (float)latLng.longitude;
 
         isLocationSetManual = true;
-        mapView.getMapAsync(this);
+        //mapView.getMapAsync(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
 
 
+    }
+
+    private void setAddress(LatLng latLng){
+        UserLocation userLocation = new UserLocation(context);
+        String address;
+        if(latLng != null)
+            address = userLocation.getAddress(latLng.latitude,latLng.longitude);
+        else{
+            Location location = userLocation.getSavedLocation();
+            address = userLocation.getAddress(location.getLatitude(),location.getLongitude());
+        }
+
+        selectedAddressTv.setText(address);
     }
 
     /**
@@ -800,25 +831,25 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+        //mapView.onResume();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+        //mapView.onDestroy();
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        mapView.onPause();
+        //mapView.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mapView.onStop();
+        //mapView.onStop();
     }
 }

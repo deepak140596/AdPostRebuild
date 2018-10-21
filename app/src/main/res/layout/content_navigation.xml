@@ -12,6 +12,7 @@
     <mehdi.sakout.fancybuttons.FancyButton
         android:layout_width="200dp"
         android:layout_height="50dp"
+        android:layout_gravity="center"
         android:layout_centerInParent="true"
         android:id="@+id/content_nav_request_permission_btn"
         fancy:fb_text="Grant Permissions"
