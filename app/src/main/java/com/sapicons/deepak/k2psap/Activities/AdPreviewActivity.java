@@ -2,19 +2,26 @@ package com.sapicons.deepak.k2psap.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +43,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
+import com.sapicons.deepak.k2psap.Adapters.CategoryAdapter;
 import com.sapicons.deepak.k2psap.Adapters.PhotoPreviewPagerAdapter;
 import com.sapicons.deepak.k2psap.Objects.CategoryItem;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
@@ -85,6 +93,11 @@ public class AdPreviewActivity extends AppCompatActivity {
     Handler handler ;
     Runnable Update;
 
+    PopupWindow popupWindow;
+
+    RelativeLayout bottomSheet;
+    BottomSheetBehavior bottomSheetBehavior;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +109,10 @@ public class AdPreviewActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         initialiseViews();
+        setupBottomSheet();
+
         setupViews();
+
         setUpViewPager();
         setUpFavButton();
     }
@@ -122,6 +138,8 @@ public class AdPreviewActivity extends AppCompatActivity {
         postUserIv = findViewById(R.id.ad_preview_user_iv);
         postUserNameTv = findViewById(R.id.ad_preview_user_name_tv);
         locationNameTv = findViewById(R.id.ad_preview_location_name_tv);
+
+        bottomSheet = findViewById(R.id.bottom_sheet_rl);
 
 
 
@@ -198,8 +216,22 @@ public class AdPreviewActivity extends AppCompatActivity {
         });
 
 
+    }
 
+    public void setupBottomSheet(){
 
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
     }
 
     public void showProgressDialog(String msg){
@@ -255,7 +287,7 @@ public class AdPreviewActivity extends AppCompatActivity {
             swipeInstructionTv.setVisibility(View.GONE);
         else swipeInstructionTv.setVisibility(View.VISIBLE);
 
-        setUpSlideShow();
+        //setUpSlideShow();
     }
 
     public void setUpDate(){
@@ -448,5 +480,6 @@ public class AdPreviewActivity extends AppCompatActivity {
         String address = userLocation.getAddress(postItem.getLatitude(),postItem.getLongitude());
         locationNameTv.setText(address);
     }
+
 
 }

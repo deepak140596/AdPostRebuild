@@ -33,6 +33,8 @@ allprojects {
         maven{
             url 'https://maven.google.com/'
         }
+
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
     }
 }
 

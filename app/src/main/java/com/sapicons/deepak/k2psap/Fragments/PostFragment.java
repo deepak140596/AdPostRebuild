@@ -96,7 +96,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by Deepak Prasad on 28-09-2018.
  */
 
-public class PostFragment extends Fragment implements OnMapReadyCallback {
+public class PostFragment extends Fragment {
 
     ImageButton imgOneIv, imgTwoIv, imgThreeIv, imgFourIv,imgFiveIv;
     //ImageView emptyViewPagerIv;
@@ -203,11 +203,8 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
 
         setAddress(null);
 
-        //initialiseMCallbacks();
-
-        // set switch listener
-
-
+        // initialise callback for verifying phone number
+        initialiseMCallbacks();
 
     }
 
@@ -226,6 +223,7 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
                 imgClicked =1;
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
+                        .setAspectRatio(1,1)
                         .start(getActivity(),PostFragment.this);
             }
         });
@@ -808,7 +806,7 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
 
-    @Override
+   /* @Override
     public void onMapReady(GoogleMap gMap) {
         googleMap= gMap;
         LatLng position;
@@ -852,4 +850,5 @@ public class PostFragment extends Fragment implements OnMapReadyCallback {
         super.onStop();
         //mapView.onStop();
     }
+    */
 }

@@ -4,14 +4,19 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 
 import com.bumptech.glide.Glide;
+import com.jsibbold.zoomage.ZoomageView;
 import com.sapicons.deepak.k2psap.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
@@ -37,20 +42,15 @@ public class PhotoPreviewPagerAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
         View view = this.layoutInflater.inflate(R.layout.item_photo_preview_view_pager,container,false);
 
-        ImageView previewImg = view.findViewById(R.id.item_view_pager_image_view);
+        //ImageView previewImg = view.findViewById(R.id.item_view_pager_image_view);
+        ZoomageView previewImg = view.findViewById(R.id.item_view_pager_image_view);
+
         Uri imgUri = this.list.get(position);
 
         if(imgUri!=null){
             Glide.with(this.context).load(imgUri).into(previewImg);
         }
         container.addView(view);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toasty.info(context,"Clicked on: "+position).show();
-            }
-        });
 
         return view;
     }
@@ -69,5 +69,6 @@ public class PhotoPreviewPagerAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
     }
+
 
 }

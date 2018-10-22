@@ -329,7 +329,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.collapsed_search_menu,menu);
-        inflater.inflate(R.menu.sort_by_type_menu,menu);
+        //inflater.inflate(R.menu.sort_by_type_menu,menu);
 
         MenuItem sortItem = menu.findItem(R.id.action_sort);
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -346,14 +346,14 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
 
-        if(itemId == R.id.action_sort){
+        /*if(itemId == R.id.action_sort){
 
             //Toasty.normal(context,"Clicked").show();
 
             //View view = getLayoutInflater().inflate(R.layout.fragment_explore,null);
             PopupWindow popupWindow = popupCategories();
             popupWindow.showAtLocation(mostRecentViewPager, Gravity.CENTER,0,0);
-        }
+        }*/
         return super.onOptionsItemSelected(item);
     }
 
