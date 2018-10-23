@@ -118,8 +118,9 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final CollectionReference docRef = db.collection("chats");
-        //Query query = docRef.orderBy("lastMsgTimestamp", Query.Direction.DESCENDING);
-        docRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        Query query = docRef.whereEqualTo("status", "open");
+
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
                                         @Nullable FirebaseFirestoreException e) {
@@ -133,6 +134,8 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                             ChatItem newItem = doc.toObject(ChatItem.class);
                             Log.d("EXPL_FRAG","Post: "+newItem.getChatId());
 
+
+                            // only show those chats which are
                             if(newItem.getLastMsgTimestamp()>0)
                                 if(newItem.getUserIdOne().equals(user.getEmail()) ||
                                         newItem.getUserIdTwo().equals(user.getEmail()))

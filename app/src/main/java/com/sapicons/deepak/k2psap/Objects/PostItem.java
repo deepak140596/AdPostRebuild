@@ -15,13 +15,14 @@ public class PostItem implements Serializable {
     String postUserPicUrl, postUserName;
     String status;
     String categoryName;
+    String exchangeFor, exchangeType;
 
     float latitude, longitude;
 
     public PostItem(){ }
 
 
-    public PostItem(String postId, String emailId, String title, String description, String price,
+    public PostItem(String postId, String emailId, String title, String description,
                     int category, String categoryName, String postUserName, String postUserPicUrl){
 
         this.postId = postId;
@@ -45,7 +46,8 @@ public class PostItem implements Serializable {
         this.latitude = 0.0f;
         this.longitude =0.0f;
 
-
+        this.exchangeFor = "";
+        this.exchangeType="";
 
     }
 
@@ -191,6 +193,22 @@ public class PostItem implements Serializable {
 
     public void setPostUserName(String postUserName) {
         this.postUserName = postUserName;
+    }
+
+    public String getExchangeFor() {
+        return exchangeFor;
+    }
+
+    public void setExchangeFor(String exchangeFor) {
+        this.exchangeFor = exchangeFor;
+    }
+
+    public String getExchangeType() {
+        return exchangeType;
+    }
+
+    public void setExchangeType(String exchangeType) {
+        this.exchangeType = exchangeType;
     }
 
     public static Comparator<PostItem> PostTimeComparator = new Comparator<PostItem>() {

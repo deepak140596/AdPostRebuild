@@ -112,7 +112,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
         holder.titleTv.setText(postItem.getTitle());
         //holder.descriptionTv.setText(postItem.getDescription());
-        holder.priceTv.setText(postItem.getPrice());
+        holder.priceTv.setText(AdPreviewActivity.setTradeType(postItem));
 
         holder.distanceTv.setText(setDistance(postItem));
         holder.dayTv.setText(getRelativeTime(Long.parseLong(postItem.getPostId())));

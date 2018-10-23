@@ -104,11 +104,15 @@ public class PostFragment extends Fragment {
     FloatingActionButton doneBtn;
     Spinner categorySpinner;
     ProgressDialog progressDialog;
-    EditText adTitleEt, descriptionEt, priceEt;
+    EditText adTitleEt, descriptionEt;
     SwitchCompat sharePhoneNumberSwitch;
     FancyButton selectLocationBtn;
     TextView emptyPicsTV, selectedAddressTv;
     RelativeLayout changeLocationLL;
+
+    LinearLayout exchangeTypeLL;
+    Spinner exchangeTypeSpinner;
+    EditText exchangeForEt, priceEt;
 
 
     Uri imgOneUri, imgTwoUri, imgThreeUri, imgFourUri, imgFiveUri;
@@ -177,7 +181,7 @@ public class PostFragment extends Fragment {
 
         adTitleEt = view.findViewById(R.id.post_title_et);
         descriptionEt = view.findViewById(R.id.post_description_et);
-        priceEt = view.findViewById(R.id.post_price_et);
+
 
         doneBtn = view.findViewById(R.id.post_done_fab);
         viewPager= view.findViewById(R.id.post_preview_images_viewpager);
@@ -190,12 +194,20 @@ public class PostFragment extends Fragment {
         selectedAddressTv = view.findViewById(R.id.frag_post_address_tv);
         changeLocationLL = view.findViewById(R.id.frag_post_select_location_rl);
 
+        exchangeTypeLL = view.findViewById(R.id.frag_post_exchange_type_ll);
+        exchangeTypeSpinner = view.findViewById(R.id.frag_post_exchange_types_spinner);
+
+        //tradePriceEt = view.findViewById(R.id.post_price_et);
+        exchangeForEt = view.findViewById(R.id.post_exchange_for_et);
+        priceEt = view.findViewById(R.id.post_price_et);
+
 
 
 
 
         list = new ArrayList<>();
 
+        setExchangeTypeToSpinner();
 
         setTextWatchers();
 
@@ -210,7 +222,7 @@ public class PostFragment extends Fragment {
 
     public void setTextWatchers(){
         // set text watchers
-        priceEt.addTextChangedListener(watcher);
+        //priceEt.addTextChangedListener(watcher);
         descriptionEt.addTextChangedListener(watcher);
         adTitleEt.addTextChangedListener(watcher);
     }
@@ -402,6 +414,49 @@ public class PostFragment extends Fragment {
         });
     }
 
+    public void setExchangeTypeToSpinner(){
+        final List<String> exchangeTypesName = new ArrayList<>();
+        exchangeTypesName.add("Price");
+        exchangeTypesName.add("Free");
+        exchangeTypesName.add("Exchange");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,exchangeTypesName);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        exchangeTypeSpinner.setAdapter(adapter);
+
+        exchangeTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String tradeType = exchangeTypesName.get(i);
+                if(tradeType.equals("Price")){
+                    exchangeForEt.setText("");
+                    priceEt.setVisibility(View.VISIBLE);
+                    exchangeForEt.setVisibility(View.GONE);
+
+                }else if(tradeType.equals("Free")){
+                    exchangeForEt.setText("");
+                    priceEt.setText("");
+                    priceEt.setVisibility(View.GONE);
+                    exchangeForEt.setVisibility(View.GONE);
+
+                }else if(tradeType.equals("Exchange")){
+                    priceEt.setText("");
+                    priceEt.setVisibility(View.GONE);
+                    exchangeForEt.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+    }
+
     // set up text watcher
 
     private  final TextWatcher watcher = new TextWatcher() {
@@ -419,8 +474,7 @@ public class PostFragment extends Fragment {
         public void afterTextChanged(Editable editable) {
 
             if(     adTitleEt.getText().toString().length() == 0
-                    || descriptionEt.getText().toString().length() ==0
-                    || priceEt.getText().toString().length() ==0        ){
+                    || descriptionEt.getText().toString().length() ==0  ){
 
                 // hide FAB
                 doneBtn.setVisibility(View.GONE);
@@ -532,6 +586,8 @@ public class PostFragment extends Fragment {
                 description = descriptionEt.getText().toString(),
                 price = priceEt.getText().toString();
         String phoneNumber = "";
+        String exchangeFor = exchangeForEt.getText().toString();
+        String exchangeType = exchangeTypeSpinner.getSelectedItem().toString();
 
         // share phone number only if user opts to
         if(sharePhoneNumberSwitch.isChecked()){
@@ -546,7 +602,7 @@ public class PostFragment extends Fragment {
             }
 
 
-        PostItem postItem = new PostItem(postId,email,title,description,price,
+        PostItem postItem = new PostItem(postId,email,title,description,
                 category,categoryName,user.getDisplayName(),user.getPhotoUrl().toString());
 
         postItem.setPhoneNumber(phoneNumber);
@@ -557,6 +613,10 @@ public class PostFragment extends Fragment {
         postItem.setImgUrlThree(imgThreeUrl);
         postItem.setImgUrlFour(imgFourUrl);
         postItem.setImgUrlFive(imgFiveUrl);
+
+        postItem.setPrice(price);
+        postItem.setExchangeFor(exchangeFor);
+        postItem.setExchangeType(exchangeType);
 
 
         FirebaseFirestore db= FirebaseFirestore.getInstance();
@@ -578,6 +638,11 @@ public class PostFragment extends Fragment {
             }
         });
     }
+
+
+
+
+
 
     private void clearUI(){
         progressDialog.dismiss();

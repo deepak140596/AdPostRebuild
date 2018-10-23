@@ -48,9 +48,11 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
@@ -257,8 +259,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //final CollectionReference docRef = db.collection("users").document(user.getEmail()).collection("");
+        CollectionReference collectionReference = db.collection("ads");
+        Query query = collectionReference.whereEqualTo("status","open");
 
-        db.collection("ads")
+        query
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
@@ -393,6 +397,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             if (!searchString.contains(newText.toLowerCase())) {
 
                 filteredValues.remove(value);
+
             }
         }
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, filteredValues);

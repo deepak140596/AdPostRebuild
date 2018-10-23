@@ -13,6 +13,7 @@ public class ChatItem implements Serializable {
     String userIdOne, userIdTwo;
     String postId;
     long lastMsgTimestamp;
+    String status;
 
     public ChatItem(){}
     public ChatItem(String chatId,String userIdOne,String userIdTwo,String postId){
@@ -21,6 +22,7 @@ public class ChatItem implements Serializable {
         this.userIdTwo = userIdTwo;
         this.postId = postId;
         this.lastMsgTimestamp = 0;
+        this.status = "open";
     }
 
     public long getLastMsgTimestamp() {
@@ -63,7 +65,15 @@ public class ChatItem implements Serializable {
         this.postId = postId;
     }
 
-   public static Comparator<ChatItem> LastActiveChatComparator = new Comparator<ChatItem>() {
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public static Comparator<ChatItem> LastActiveChatComparator = new Comparator<ChatItem>() {
        @Override
        public int compare(ChatItem chatItem, ChatItem t1) {
            long timestamp1 = chatItem.getLastMsgTimestamp();

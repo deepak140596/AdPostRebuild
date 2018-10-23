@@ -74,10 +74,17 @@ public class AdPreviewActivity extends AppCompatActivity {
     ImageView emptyViewPagerIv, postUserIv;
     TextView titleTv, datePostedTv, descriptionTv, priceTv, distanceTv, categoryTv, swipeInstructionTv;
     TextView postUserNameTv, locationNameTv;
-    FancyButton callBtn, messageBtn;
+    FancyButton callBtn, messageBtn,closeBtn;
     LinearLayout contactLL;
     RelativeLayout closeRl;
     FloatingActionButton addRemFavBtn;
+
+    PopupWindow popupWindow;
+
+    RelativeLayout bottomSheet;
+    BottomSheetBehavior bottomSheetBehavior;
+
+
 
     FirebaseUser user;
     ProgressDialog progressDialog;
@@ -93,10 +100,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     Handler handler ;
     Runnable Update;
 
-    PopupWindow popupWindow;
 
-    RelativeLayout bottomSheet;
-    BottomSheetBehavior bottomSheetBehavior;
 
 
     @Override
@@ -129,6 +133,7 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         callBtn = findViewById(R.id.ad_preview_call_btn);
         messageBtn = findViewById(R.id.ad_preview_message_btn);
+        closeBtn = findViewById(R.id.ad_preview_close_btn);
 
         contactLL= findViewById(R.id.ad_preview_contact_ll);
         closeRl = findViewById(R.id.ad_preview_close_post_rl);
@@ -151,7 +156,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     public void setupViews(){
         titleTv.setText(postItem.getTitle());
         descriptionTv.setText(postItem.getDescription());
-        priceTv.setText(postItem.getPrice());
+        priceTv.setText(setTradeType(postItem));
         distanceTv.setText(setDistance(postItem));
 
         // set category
@@ -184,7 +189,12 @@ public class AdPreviewActivity extends AppCompatActivity {
 
 
         // setup close post feature
-
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeStatusOfPost(postItem,"closed");
+            }
+        });
 
 
         // setup chat
@@ -479,6 +489,74 @@ public class AdPreviewActivity extends AppCompatActivity {
         UserLocation userLocation = new UserLocation(this);
         String address = userLocation.getAddress(postItem.getLatitude(),postItem.getLongitude());
         locationNameTv.setText(address);
+    }
+
+    public static String setTradeType(PostItem postItem){
+        String exchangeType = postItem.getExchangeType();
+
+        // TODO
+        // remove next two lines
+        if(exchangeType==null)
+            exchangeType = "Price";
+        if(exchangeType.equals("Free"))
+            return "Free";
+        else if(exchangeType.equals("Price"))
+            return postItem.getPrice();
+        else if(exchangeType.equals("Exchange"))
+            return "Exchange for "+postItem.getExchangeFor();
+
+        return "";
+    }
+
+    public void changeStatusOfPost(final PostItem postItem, final String status){
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = firebaseFirestore.collection("ads").document(postItem.getPostId());
+        documentReference.update("status",status).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG,"Update status of post failed. Error: "+e);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                    CollectionReference collectionReference = FirebaseFirestore.getInstance().collection("chats");
+                    Query query = collectionReference.whereEqualTo("postId", postItem.getPostId());
+
+                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                 for(QueryDocumentSnapshot document : task.getResult()){
+                                     ChatItem chatItem = document.toObject(ChatItem.class);
+                                     changeStatusOfChats(chatItem, status);
+                                 }
+
+                                Toasty.info(AdPreviewActivity.this,"Ad Closed!").show();
+                                finish();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG,"Failed getting chats . Error: "+e);
+                        }
+                    });
+
+
+            }
+        });
+    }
+
+    public void changeStatusOfChats(ChatItem chatItem,String status){
+
+        DocumentReference chatDoc = FirebaseFirestore.getInstance().collection("chats").document(chatItem.getChatId());
+        chatDoc.update("status", status).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG,"Failed updating status of chat  . Error: "+e);
+            }
+        });
     }
 
 
