@@ -170,7 +170,8 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         // if ad is posted by the same user, show close ad option
         if(user.getEmail().equals(postItem.getEmailId()))
-            closeRl.setVisibility(View.VISIBLE);
+            if(postItem.getStatus().equals("open"))
+                closeRl.setVisibility(View.VISIBLE);
         else
             contactLL.setVisibility(View.VISIBLE);
 

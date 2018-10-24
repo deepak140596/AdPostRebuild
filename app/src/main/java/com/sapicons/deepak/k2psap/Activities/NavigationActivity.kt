@@ -154,7 +154,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.nav_your_posts -> {
 
                 if(isPermissionAcquired)
-                startActivity(Intent(this,YourAdsActivity::class.java))
+                    startActivity(Intent(this,PostedAdsActivity::class.java))
             }
 
             R.id.nav_profile_view -> {
@@ -167,7 +167,6 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             }
             R.id.nav_share -> {
-
             }
             R.id.nav_send -> {
 

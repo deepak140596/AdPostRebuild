@@ -62,7 +62,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.NavigationActivity" />
         </activity>
-        <activity android:name=".Activities.ProfileView"></activity>
+        <activity android:name=".Activities.ProfileView" />
+        <activity android:name=".Activities.PostedAdsActivity"></activity>
     </application>
 
 </manifest>
