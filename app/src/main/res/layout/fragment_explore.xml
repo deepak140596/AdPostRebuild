@@ -7,7 +7,7 @@
 
         <android.support.v4.view.ViewPager
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="0dp"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:id="@+id/frag_explore_vp"
@@ -96,9 +96,40 @@
         </LinearLayout>
 
         <ListView
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/frag_explore_ads_list_view"/>
+
+        <LinearLayout
+            android:id="@+id/frag_exp_empty_listview_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/open_book"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:lines="2"
+                    android:textSize="16sp"
+                    android:text="No ads nearby."/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:lines="2"
+                    android:text="Please come back few moments later"/>
+        </LinearLayout>
 
         <!--<android.support.v7.widget.RecyclerView
             android:id="@+id/frag_explore_ads_recycler_view"

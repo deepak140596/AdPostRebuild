@@ -9,4 +9,33 @@
         android:layout_height="match_parent"
         android:id="@+id/frag_chat_recycler_view"/>
 
+    <LinearLayout
+        android:id="@+id/frag_chats_empty_listview_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:src="@drawable/empty_mail_box"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:lines="2"
+            android:textSize="16sp"
+            android:text="No Messages."/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:lines="2"
+            android:text="Start some chats to see messages!"/>
+    </LinearLayout>
+
 </RelativeLayout>

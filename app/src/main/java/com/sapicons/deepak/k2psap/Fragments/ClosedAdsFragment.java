@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -48,6 +49,7 @@ public class ClosedAdsFragment extends Fragment implements SearchView.OnQueryTex
     ListView adListView;
     List<PostItem> postList;
     AdPostAdapter postItemAdapter;
+    LinearLayout emptyClosedAdsLL;
 
     ProgressDialog progressDialog ;
     @Nullable
@@ -71,10 +73,12 @@ public class ClosedAdsFragment extends Fragment implements SearchView.OnQueryTex
 
 
         adListView = view.findViewById(R.id.frag_closed_ads_listview);
+        emptyClosedAdsLL = view.findViewById(R.id.frag_closed_ads_empty_listview_ll);
 
         postList = new ArrayList<>();
         postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
         adListView.setAdapter(postItemAdapter);
+        adListView.setEmptyView(emptyClosedAdsLL);
 
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Please Wait ...");

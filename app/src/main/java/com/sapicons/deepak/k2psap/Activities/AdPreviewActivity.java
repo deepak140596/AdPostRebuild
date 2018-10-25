@@ -72,7 +72,8 @@ public class AdPreviewActivity extends AppCompatActivity {
     PostItem postItem;
     ViewPager viewPager;
     ImageView emptyViewPagerIv, postUserIv;
-    TextView titleTv, datePostedTv, descriptionTv, priceTv, distanceTv, categoryTv, swipeInstructionTv;
+    TextView titleTv, datePostedTv, descriptionTv, priceTv;
+    TextView distanceTv, categoryTv, swipeInstructionTv, closedAdInstructionTv;
     TextView postUserNameTv, locationNameTv;
     FancyButton callBtn, messageBtn,closeBtn;
     LinearLayout contactLL;
@@ -90,6 +91,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
 
     boolean isFav = false;
+    //boolean isFavFrag = false;
 
     // related to slideshow
     int currentPage = 0;
@@ -109,6 +111,7 @@ public class AdPreviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ad_preview);
 
         postItem = (PostItem)getIntent().getSerializableExtra("selected_post_item");
+        //isFavFrag = getIntent().getBooleanExtra("is_fav_frag",true);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -143,6 +146,7 @@ public class AdPreviewActivity extends AppCompatActivity {
         postUserIv = findViewById(R.id.ad_preview_user_iv);
         postUserNameTv = findViewById(R.id.ad_preview_user_name_tv);
         locationNameTv = findViewById(R.id.ad_preview_location_name_tv);
+        closedAdInstructionTv = findViewById(R.id.ad_preview_closed_ad_instruction_tv);
 
         bottomSheet = findViewById(R.id.bottom_sheet_rl);
 
@@ -168,12 +172,15 @@ public class AdPreviewActivity extends AppCompatActivity {
         if(postItem.getPhoneNumber().isEmpty())
             callBtn.setVisibility(View.GONE);
 
-        // if ad is posted by the same user, show close ad option
-        if(user.getEmail().equals(postItem.getEmailId()))
-            if(postItem.getStatus().equals("open"))
-                closeRl.setVisibility(View.VISIBLE);
-        else
-            contactLL.setVisibility(View.VISIBLE);
+        // setup contact layouts and disable them as per closed posts
+        // if the ad prev is from fav fragments,check if its stauts is closed
+        //Log.d(TAG,"isFavFrag: "+isFavFrag);
+        //if(isFavFrag)
+            checkStatusForFavFragment();
+        //else
+            //setupContactDetails();
+
+
 
         // setup posted date
         setUpDate();
@@ -187,6 +194,7 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         // setup location name
         setupLocationName();
+
 
 
         // setup close post feature
@@ -547,6 +555,15 @@ public class AdPreviewActivity extends AppCompatActivity {
 
             }
         });
+
+        DocumentReference dr = firebaseFirestore.collection("favorites")
+                .document(user.getEmail()).collection("favoritedAds").document(postItem.getPostId());
+        dr.update("status",status).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG,"Update status of fav post failed. Error: "+e);
+            }
+        });
     }
 
     public void changeStatusOfChats(ChatItem chatItem,String status){
@@ -560,5 +577,51 @@ public class AdPreviewActivity extends AppCompatActivity {
         });
     }
 
+    public void checkStatusForFavFragment(){
+        showProgressDialog("Please Wait!");
+        DocumentReference postRef = FirebaseFirestore.getInstance().collection("ads").document(postItem.getPostId());
+        postRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    PostItem pi = task.getResult().toObject(PostItem.class);
 
+                    if(pi.getStatus().equals("closed")){
+                        closeRl.setVisibility(View.GONE);
+                        contactLL.setVisibility(View.GONE);
+                        closedAdInstructionTv.setVisibility(View.VISIBLE);
+                        progressDialog.dismiss();
+                    }else{
+                        progressDialog.dismiss();
+                        setupContactDetails();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG,"Error fetching doc: "+e);
+                if(progressDialog.isShowing())
+                    progressDialog.dismiss();
+            }
+        });
+    }
+
+    public void setupContactDetails(){
+
+        // if ad is posted by the same user, show close ad option
+
+            if (user.getEmail().equals(postItem.getEmailId())) {
+                if (postItem.getStatus().equals("open"))
+                    closeRl.setVisibility(View.VISIBLE);
+                else if (postItem.getStatus().equals("closed"))
+                    closedAdInstructionTv.setVisibility(View.VISIBLE);
+            } else {
+                if (postItem.getStatus().equals("closed"))
+                    closedAdInstructionTv.setVisibility(View.VISIBLE);
+                else
+                    contactLL.setVisibility(View.VISIBLE);
+            }
+
+    }
 }

@@ -65,8 +65,8 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         TextView titleTv, descriptionTv, priceTv, distanceTv, dayTv;
         ImageView coverIv, userPostedPicIv;
         boolean isFavorited=false;
-        ImageView favButton,unfavButton;
-        ImageButton favBtn, unfavBtn, chatBtn, callBtn;
+        //ImageView favButton,unfavButton;
+        ImageButton favBtn, unfavBtn; //chatBtn, callBtn;
         int position;
     }
 
@@ -110,6 +110,13 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
         final PostItem postItem =getItem(position);
 
+        if(postItem.getStatus().equals("closed")){
+            holder.favBtn.setVisibility(View.GONE);
+            holder.unfavBtn.setVisibility(View.GONE);
+        }else{
+            // set if the ad is favorited or not
+            setFavButton(holder,postItem);
+        }
         holder.titleTv.setText(postItem.getTitle());
         //holder.descriptionTv.setText(postItem.getDescription());
         holder.priceTv.setText(AdPreviewActivity.setTradeType(postItem));
@@ -128,8 +135,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
             holder.userPostedPicIv.setImageResource(R.drawable.placeholder_profile);
 
 
-        // set if the ad is favorited or not
-        setFavButton(holder,postItem);
+
 
        holder.favBtn.setOnClickListener(new View.OnClickListener() {
            @Override

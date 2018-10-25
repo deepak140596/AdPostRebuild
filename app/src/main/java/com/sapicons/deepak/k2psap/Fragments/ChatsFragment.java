@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -50,6 +51,7 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
     List<ChatItem> chatList;
     RecyclerView.Adapter chatItemAdapter;
     RecyclerView.LayoutManager mLayoutManager;
+    LinearLayout emptyChatsLL;
     Context context;
     ProgressDialog progressDialog;
 
@@ -79,12 +81,14 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
 
         chatList= new ArrayList<>();
         chatsRecyclerView = view.findViewById(R.id.frag_chat_recycler_view);
+        emptyChatsLL = view.findViewById(R.id.frag_chats_empty_listview_ll);
 
         mLayoutManager = new LinearLayoutManager(context);
         chatsRecyclerView.setLayoutManager(mLayoutManager);
 
         chatItemAdapter = new ChatItemAdapter(context,chatList);
         chatsRecyclerView.setAdapter(chatItemAdapter);
+
 
 
 
@@ -146,6 +150,11 @@ public class ChatsFragment extends Fragment implements SearchView.OnQueryTextLis
                         Collections.sort(chatList,ChatItem.LastActiveChatComparator);
                         chatItemAdapter = new ChatItemAdapter(context,chatList);
                         chatsRecyclerView.setAdapter(chatItemAdapter);
+
+                        if(chatList.isEmpty()){
+                            chatsRecyclerView.setVisibility(View.GONE);
+                            emptyChatsLL.setVisibility(View.VISIBLE);
+                        }
 
                         //chatItemAdapter.notifyDataSetChanged();
 

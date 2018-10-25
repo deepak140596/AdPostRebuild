@@ -153,13 +153,13 @@ public class UserLocation {
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             Address obj = addresses.get(0);
-            String add = obj.getThoroughfare();
+            String add = (obj.getThoroughfare()==null) ? "" :obj.getThoroughfare()+", ";
             //add = add + "\n" + obj.getCountryName();
             //add = add + "\n" + obj.getCountryCode();
             //add = add + "\n" + obj.getAdminArea();
             //add = add + "\n" + obj.getPostalCode();
-            add = add + ", " + obj.getSubLocality();
-            add = add + ", " + obj.getSubAdminArea();
+            add = add + ((obj.getSubLocality()==null) ? "" : obj.getSubLocality()+", ");
+            add = add + ((obj.getSubAdminArea()==null) ? "" : obj.getSubAdminArea());
             //add = add + "\n" + obj.getLocality();
             //add = add + "\n" + obj.getSubThoroughfare();
             //add= add+ "\n" +
@@ -172,10 +172,17 @@ public class UserLocation {
             // TennisAppActivity.showDialog(add);
             return add;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         return "";
+    }
+
+    public String checkForNull(String s){
+        if(s==null)
+            return "";
+        else
+            return s;
     }
 }

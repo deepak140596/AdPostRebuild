@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -42,6 +43,7 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
     ListView adListView;
     List<PostItem> postList;
     AdPostAdapter postItemAdapter;
+    LinearLayout emptyFavLL;
     Context context;
 
 
@@ -66,6 +68,7 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
 
 
         adListView =view.findViewById(R.id.frag_fav_listview);
+        emptyFavLL = view.findViewById(R.id.frag_fav_empty_listview_ll);
         //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
 
         //mLayoutManager = new LinearLayoutManager(context);
@@ -78,6 +81,7 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
         postList = new ArrayList<>();
         postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
         adListView.setAdapter(postItemAdapter);
+        adListView.setEmptyView(emptyFavLL);
 
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
                 , adRecyclerView, new RecyclerViewTouchListener.ClickListener() {
@@ -104,6 +108,7 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
                 //Bundle bundle =
                 PostItem item = (PostItem)adapterView.getItemAtPosition(i);
                 intent.putExtra("selected_post_item",item);
+                //intent.putExtra("is_fav_frag",true);
                 startActivity(intent);
             }
         });

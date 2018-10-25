@@ -90,6 +90,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     ListView adListView;
     LinearLayout filterAndLocationLL;
+    LinearLayout emptyLL;
 
     //RecyclerView adRecyclerView;
     ViewPager mostRecentViewPager;
@@ -175,11 +176,13 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         selectedLocationTv = view.findViewById(R.id.frag_explore_address_tv);
 
         filterAndLocationLL = view.findViewById(R.id.frag_explore_filter_ll);
+        emptyLL = view.findViewById(R.id.frag_exp_empty_listview_ll);
 
 
         nearbyPostList = new ArrayList<>();
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
         adListView.setAdapter(postItemAdapter);
+        adListView.setEmptyView(emptyLL);
 
 
 

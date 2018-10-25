@@ -15,8 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +30,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
+import com.sapicons.deepak.k2psap.Activities.PostedAdsActivity;
 import com.sapicons.deepak.k2psap.Activities.YourAdsActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
@@ -49,6 +52,8 @@ public class ActiveAdsFragment extends Fragment implements SearchView.OnQueryTex
     ListView adListView;
     List<PostItem> postList;
     AdPostAdapter postItemAdapter;
+
+    LinearLayout emptyActivePostsLL;
 
     ProgressDialog progressDialog ;
 
@@ -72,10 +77,13 @@ public class ActiveAdsFragment extends Fragment implements SearchView.OnQueryTex
 
 
         adListView = view.findViewById(R.id.frag_active_ads_listview);
+        emptyActivePostsLL = view.findViewById(R.id.frag_active_ads_empty_listview_ll);
+
 
         postList = new ArrayList<>();
         postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
         adListView.setAdapter(postItemAdapter);
+        adListView.setEmptyView(emptyActivePostsLL);
 
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Please Wait ...");
@@ -91,6 +99,8 @@ public class ActiveAdsFragment extends Fragment implements SearchView.OnQueryTex
                 startActivity(intent);
             }
         });
+
+
     }
 
 

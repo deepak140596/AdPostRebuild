@@ -102,7 +102,8 @@ public class ProfileView extends AppCompatActivity {
     private void setViews(){
         nameTv.setText(user.getDisplayName());
         emailTv.setText(user.getEmail());
-        if(user.getPhoneNumber().length() >0){
+        Log.d(TAG,"Phone Num: "+user.getPhoneNumber());
+        if(user.getPhoneNumber().toString().length()>0){
             phoneTv.setText(user.getPhoneNumber());
             addPhoneBtn.setVisibility(View.GONE);
         }else{
