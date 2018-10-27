@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -59,6 +60,7 @@ import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Activities.MapsActivity;
 import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
+import com.sapicons.deepak.k2psap.Adapters.AdPostGridViewAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostRecyclerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostViewPagerAdapter;
 import com.sapicons.deepak.k2psap.Adapters.CategoryAdapter;
@@ -89,6 +91,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     String TAG = "EXP_FRAG";
 
     ListView adListView;
+    GridView gridView;
     LinearLayout filterAndLocationLL;
     LinearLayout emptyLL;
 
@@ -96,7 +99,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     ViewPager mostRecentViewPager;
     List<PostItem> nearbyPostList;
     List<PostItem> selectedCategoryPostList;
+    List<PostItem> searchList;
     AdPostAdapter postItemAdapter;
+    AdPostGridViewAdapter gridViewAdapter;
     //RecyclerView.Adapter postItemRAdapter;
     //RecyclerView.LayoutManager mLayoutManager;
     Context context;
@@ -158,6 +163,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
 
         adListView = view.findViewById(R.id.frag_explore_ads_list_view);
+        gridView = view.findViewById(R.id.frag_explore_gridview);
+
         //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
         mostRecentViewPager = view.findViewById(R.id.frag_explore_vp);
         progressDialog = new ProgressDialog(context);
@@ -183,6 +190,11 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
         adListView.setAdapter(postItemAdapter);
         adListView.setEmptyView(emptyLL);
+        setGridOrList();
+
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,nearbyPostList);
+        gridView.setAdapter(gridViewAdapter);
+        gridView.setEmptyView(emptyLL);
 
 
 
@@ -192,21 +204,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
     public void setOnClickListeners(){
 
-        adListView.setOnScrollListener(new OnScrollObserver() {
-            @Override
-            public void onScrollUp() {
-                Log.d(TAG,"Scroll Up");
-
-                filterAndLocationLL.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onScrollDown() {
-
-                Log.d(TAG,"Scroll Down");
-                filterAndLocationLL.setVisibility(View.GONE);
-            }
-        });
+        setScrollListener();
 
         adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -215,6 +213,19 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
                 //Bundle bundle =
                 PostItem item = (PostItem) adapterView.getItemAtPosition(i);
+                intent.putExtra("selected_post_item", item);
+                startActivity(intent);
+            }
+        });
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d(TAG,"Ad Clicked: "+i);
+                Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
+                //Bundle bundle =
+                PostItem item = searchList.get(i);
+                Log.d(TAG,"PI: "+item.getTitle());
                 intent.putExtra("selected_post_item", item);
                 startActivity(intent);
             }
@@ -286,14 +297,27 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         nearbyPostList = new_list;
                         Collections.sort(nearbyPostList,PostItem.PostTimeComparator);
                         selectedCategoryPostList = new_list;
+                        searchList = new_list;
+
+
+
+                        // list view setup
                         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, nearbyPostList);
                         adListView.setAdapter(postItemAdapter);
+                        setGridOrList();
+
+                        // recycler view setup
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);
 
                         //postItemRAdapter.notifyDataSetChanged();
                         //setUpViewPager(isMapActivityClosed);
                         //progressDialog.dismiss();
+
+                        // gridview setup
+                        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,nearbyPostList);
+                        gridView.setAdapter(gridViewAdapter);
+
 
                     }
                 });
@@ -403,8 +427,13 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
             }
         }
+        searchList = filteredValues;
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, filteredValues);
         adListView.setAdapter(postItemAdapter);
+        setGridOrList();
+
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,filteredValues);
+        gridView.setAdapter(gridViewAdapter);
 
         return false;
     }
@@ -422,17 +451,27 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 selectedCategoryPostList.remove(item);
         }
 
+        searchList = selectedCategoryPostList;
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, selectedCategoryPostList);
         adListView.setAdapter(postItemAdapter);
+        setGridOrList();
+
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,selectedCategoryPostList);
+        gridView.setAdapter(gridViewAdapter);
     }
 
 
 
     public void resetSearch(){
 
-        mostRecentViewPager.setVisibility(View.VISIBLE);
+        //mostRecentViewPager.setVisibility(View.VISIBLE);
+        searchList = selectedCategoryPostList;
         postItemAdapter = new AdPostAdapter(context, R.layout.item_ad, selectedCategoryPostList);
         adListView.setAdapter(postItemAdapter);
+        setGridOrList();
+
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,selectedCategoryPostList);
+        gridView.setAdapter(gridViewAdapter);
     }
 
 
@@ -564,5 +603,29 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         Location location = userLocation.getSavedLocation();
         String address = userLocation.getAddress(location.getLatitude(),location.getLongitude());
         selectedLocationTv.setText(address);
+    }
+
+    private void setGridOrList(){
+        adListView.setVisibility(View.GONE);
+    }
+
+    private  void setScrollListener(){
+        gridView.setOnScrollListener(new OnScrollObserver() {
+            @Override
+            public void onScrollUp() {
+                Log.d(TAG,"Scroll Up");
+
+                filterAndLocationLL.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onScrollDown() {
+
+                Log.d(TAG,"Scroll Down");
+                filterAndLocationLL.setVisibility(View.GONE);
+            }
+        });
+
+
     }
 }
