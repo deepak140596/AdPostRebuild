@@ -304,7 +304,7 @@
 
             </mehdi.sakout.fancybuttons.FancyButton>
 
-            <com.google.android.gms.maps.MapView
+            <!--<com.google.android.gms.maps.MapView
 
                 android:id="@+id/post_map_frag"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -313,7 +313,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone"/>
+                android:visibility="gone"/>-->
 
         </LinearLayout>
     </ScrollView>

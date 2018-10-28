@@ -139,9 +139,9 @@ public class PostFragment extends Fragment {
     int PLACE_PICKER_REQUEST = 1;
 
     // for map
-    GoogleMap googleMap;
-    MapView mapView;
-    Marker marker;
+    //GoogleMap googleMap;
+    //MapView mapView;
+    //Marker marker;
 
     @Nullable
     @Override
@@ -813,12 +813,6 @@ public class PostFragment extends Fragment {
         });
     }
 
-    public String getLocale(){
-        String locale = context.getResources().getConfiguration().locale.getCountry();
-        Log.d(TAG,"Country: "+locale);
-        return locale;
-    }
-
     public void createPlacePicker(){
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
@@ -833,7 +827,6 @@ public class PostFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 
     private void saveLocation(LatLng latLng){
         latitude = (float)latLng.latitude;

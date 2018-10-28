@@ -13,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -74,7 +75,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     ImageView emptyViewPagerIv, postUserIv;
     TextView titleTv, datePostedTv, descriptionTv, priceTv;
     TextView distanceTv, categoryTv, swipeInstructionTv, closedAdInstructionTv;
-    TextView postUserNameTv, locationNameTv;
+    TextView postUserNameTv, locationNameTv, relativeTimeTv;
     FancyButton callBtn, messageBtn,closeBtn;
     LinearLayout contactLL;
     RelativeLayout closeRl;
@@ -148,6 +149,8 @@ public class AdPreviewActivity extends AppCompatActivity {
         locationNameTv = findViewById(R.id.ad_preview_location_name_tv);
         closedAdInstructionTv = findViewById(R.id.ad_preview_closed_ad_instruction_tv);
 
+        relativeTimeTv = findViewById(R.id.ad_preview_relative_time_tv);
+
         bottomSheet = findViewById(R.id.bottom_sheet_rl);
 
 
@@ -194,6 +197,9 @@ public class AdPreviewActivity extends AppCompatActivity {
 
         // setup location name
         setupLocationName();
+
+        // set relative time
+        relativeTimeTv.setText(getRelativeTime(Long.parseLong(postItem.getPostId())));
 
 
 
@@ -623,5 +629,12 @@ public class AdPreviewActivity extends AppCompatActivity {
                     contactLL.setVisibility(View.VISIBLE);
             }
 
+    }
+
+    public static String getRelativeTime(long oldTime){
+
+        long now = Calendar.getInstance().getTimeInMillis();
+        CharSequence ago = DateUtils.getRelativeTimeSpanString(oldTime,now,DateUtils.MINUTE_IN_MILLIS);
+        return ago.toString();
     }
 }

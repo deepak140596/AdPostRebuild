@@ -263,7 +263,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
 
     }
 
-    public String getRelativeTime(long oldTime){
+    public static String getRelativeTime(long oldTime){
 
         long now = Calendar.getInstance().getTimeInMillis();
         CharSequence ago = DateUtils.getRelativeTimeSpanString(oldTime,now,DateUtils.MINUTE_IN_MILLIS);

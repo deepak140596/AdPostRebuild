@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="16dp"
-            android:backgroundTint="#b0bec5">
+            android:backgroundTint="#e0e0e0">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -55,6 +55,16 @@
                             android:layout_toRightOf="@id/ad_preview_user_iv"
                             android:textSize="12sp"
                             android:text="Posted on Sept 30"/>
+                        <TextView
+                            android:id="@+id/ad_preview_relative_time_tv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/ad_preview_posted_on_tv"
+                            android:layout_below="@+id/ad_preview_user_name_tv"
+                            android:layout_alignParentEnd="true"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/blue"
+                            android:text="5 days ago"/>
 
                         <View
                             android:layout_width="match_parent"
@@ -120,6 +130,7 @@
                             android:id="@+id/ad_preview_distance_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             android:textSize="12sp"
                             android:layout_toRightOf="@id/ad_preview_location_iv"
                             android:text="11.2 kms away"/>
@@ -146,6 +157,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:layout_marginBottom="8dp"
                         android:textSize="14sp"
                         android:text="Nexus 5 Nexus 5 oijodfsjas  ouuwodksmoiasdfmsafd oijmfdlksdks "
@@ -172,27 +184,26 @@
                     android:visibility="gone">
 
                     <mehdi.sakout.fancybuttons.FancyButton
-                        android:layout_width="110dp"
+                        android:layout_width="150dp"
                         android:layout_height="50dp"
                         android:layout_marginRight="32dp"
                         android:id="@+id/ad_preview_call_btn"
                         fancy:fb_text="Call"
-                        fancy:fb_textColor="#000000"
-                        fancy:fb_radius="10dp"
-                        fancy:fb_iconResource="@mipmap/ic_phone_icon"
-                        fancy:fb_focusColor="#5577bd"
-                        fancy:fb_defaultColor="#b5e4d5"/>
+                        fancy:fb_iconResource="@mipmap/ic_phone_white"
+                        fancy:fb_textColor="@color/white"
+                        fancy:fb_radius="1dp"
+                        fancy:fb_focusColor="#e0e0e0"
+                        fancy:fb_defaultColor="#00695c"/>
 
                     <mehdi.sakout.fancybuttons.FancyButton
-                        android:layout_width="110dp"
+                        android:layout_width="150dp"
                         android:layout_height="50dp"
                         android:id="@+id/ad_preview_message_btn"
                         fancy:fb_text="Chat"
-                        fancy:fb_textColor="#000000"
-                        fancy:fb_radius="10dp"
-                        fancy:fb_iconResource="@mipmap/ic_chat_icon"
-                        fancy:fb_focusColor="#5577bd"
-                        fancy:fb_defaultColor="#b5e4d5"/>
+                        fancy:fb_iconResource="@mipmap/ic_chat_white"
+                        fancy:fb_radius="1dp"
+                        fancy:fb_focusColor="#e0e0e0"
+                        fancy:fb_defaultColor="#00695c"/>
                 </LinearLayout>
 
                 <RelativeLayout
@@ -209,11 +220,10 @@
                         android:layout_centerInParent="true"
                         android:id="@+id/ad_preview_close_btn"
                         fancy:fb_text="Close Ad"
-                        fancy:fb_textColor="@color/black"
-                        fancy:fb_radius="10dp"
-                        fancy:fb_iconResource="@mipmap/ic_close_icon"
-                        fancy:fb_focusColor="@color/indigo400"
-                        fancy:fb_defaultColor="@color/teal100"/>
+                        fancy:fb_textColor="@color/white"
+                        fancy:fb_radius="1dp"
+                        fancy:fb_focusColor="#e0e0e0"
+                        fancy:fb_defaultColor="#a30000"/>
                 </RelativeLayout>
 
                 <TextView

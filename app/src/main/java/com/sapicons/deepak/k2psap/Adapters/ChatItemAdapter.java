@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Activities.ChatActivity;
 import com.sapicons.deepak.k2psap.Objects.ChatItem;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
@@ -99,7 +100,7 @@ public class ChatItemAdapter extends RecyclerView.Adapter<ChatItemAdapter.ChatIt
                         Log.d("CIA","Documents Snapshot data: "+documentSnapshot);
                         PostItem postItem = documentSnapshot.toObject(PostItem.class);
                         holder.adTitleTv.setText(postItem.getTitle());
-                        holder.priceTv.setText(postItem.getPrice());
+                        holder.priceTv.setText(AdPreviewActivity.setTradeType(postItem));
                         if(!postItem.getImgUrlOne().isEmpty())
                             Glide.with(context).load(postItem.getImgUrlOne()).into(holder.adImageView);
                         else

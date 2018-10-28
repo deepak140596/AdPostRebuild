@@ -4,10 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
+    <!--<ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/frag_fav_listview"/>
+        android:id="@+id/frag_fav_listview"/>-->
+    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/frag_favorites_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="90dp"
+        android:numColumns="2"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:visibility="visible"/>
 
     <LinearLayout
         android:id="@+id/frag_fav_empty_listview_ll"

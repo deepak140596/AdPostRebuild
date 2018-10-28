@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
+import com.sapicons.deepak.k2psap.Adapters.AdPostGridViewAdapter;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.R;
 
@@ -40,9 +42,13 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
 
     String TAG = "FAV_FRAG";
 
-    ListView adListView;
+    //ListView adListView;
+    GridView gridView;
+
     List<PostItem> postList;
-    AdPostAdapter postItemAdapter;
+    //AdPostAdapter postItemAdapter;
+    AdPostGridViewAdapter gridViewAdapter;
+
     LinearLayout emptyFavLL;
     Context context;
 
@@ -67,7 +73,8 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
     public void initialiseViews(View view){
 
 
-        adListView =view.findViewById(R.id.frag_fav_listview);
+        //adListView =view.findViewById(R.id.frag_fav_listview);
+        gridView = view.findViewById(R.id.frag_favorites_gridview);
         emptyFavLL = view.findViewById(R.id.frag_fav_empty_listview_ll);
         //adRecyclerView = view.findViewById(R.id.frag_explore_ads_recycler_view);
 
@@ -79,10 +86,18 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
 
 
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
-        adListView.setAdapter(postItemAdapter);
-        adListView.setEmptyView(emptyFavLL);
 
+        // for list view
+        //postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
+        //adListView.setAdapter(postItemAdapter);
+        //adListView.setEmptyView(emptyFavLL);
+
+        // for grid view
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,postList);
+        gridView.setAdapter(gridViewAdapter);
+        gridView.setEmptyView(emptyFavLL);
+
+        // for recycler view
         /*adRecyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity()
                 , adRecyclerView, new RecyclerViewTouchListener.ClickListener() {
             @Override
@@ -101,12 +116,12 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
         }));*/
 
 
-        adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), AdPreviewActivity.class);
                 //Bundle bundle =
-                PostItem item = (PostItem)adapterView.getItemAtPosition(i);
+                PostItem item = postList.get(i);
                 intent.putExtra("selected_post_item",item);
                 //intent.putExtra("is_fav_frag",true);
                 startActivity(intent);
@@ -142,8 +157,12 @@ public class FavoritesFragment extends Fragment implements SearchView.OnQueryTex
 
                         }
                         postList = new_list;
-                        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
-                        adListView.setAdapter(postItemAdapter);
+                        //postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
+                        //adListView.setAdapter(postItemAdapter);
+
+                        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,postList);
+                        gridView.setAdapter(gridViewAdapter);
+
                         //postItemRAdapter = new AdPostRecyclerAdapter(context,postList);
                         //adRecyclerView.setAdapter(postItemRAdapter);
 

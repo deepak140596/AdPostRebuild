@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -30,6 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
+import com.sapicons.deepak.k2psap.Adapters.AdPostGridViewAdapter;
 import com.sapicons.deepak.k2psap.Objects.PostItem;
 import com.sapicons.deepak.k2psap.R;
 
@@ -46,9 +48,14 @@ public class ClosedAdsFragment extends Fragment implements SearchView.OnQueryTex
     Context context;
     String TAG = "CLOSED_ADS_FRAGMENT";
 
-    ListView adListView;
+    //ListView adListView;
+    GridView gridView;
+
+
     List<PostItem> postList;
-    AdPostAdapter postItemAdapter;
+    //AdPostAdapter postItemAdapter;
+    AdPostGridViewAdapter gridViewAdapter;
+
     LinearLayout emptyClosedAdsLL;
 
     ProgressDialog progressDialog ;
@@ -72,24 +79,32 @@ public class ClosedAdsFragment extends Fragment implements SearchView.OnQueryTex
     public void initialiseViews(View view){
 
 
-        adListView = view.findViewById(R.id.frag_closed_ads_listview);
+        //adListView = view.findViewById(R.id.frag_closed_ads_listview);
+        gridView = view.findViewById(R.id.frag_closed_ads_gridview);
         emptyClosedAdsLL = view.findViewById(R.id.frag_closed_ads_empty_listview_ll);
 
         postList = new ArrayList<>();
-        postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
-        adListView.setAdapter(postItemAdapter);
-        adListView.setEmptyView(emptyClosedAdsLL);
+
+        // for listview
+        //postItemAdapter = new AdPostAdapter(context,R.layout.item_ad,postList);
+        //adListView.setAdapter(postItemAdapter);
+       // adListView.setEmptyView(emptyClosedAdsLL);
+
+        // for grid view
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,postList);
+        gridView.setAdapter(gridViewAdapter);
+        gridView.setEmptyView(emptyClosedAdsLL);
 
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Please Wait ...");
 
 
-        adListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(context, AdPreviewActivity.class);
                 //Bundle bundle =
-                PostItem item = (PostItem)adapterView.getItemAtPosition(i);
+                PostItem item = postList.get(i);
                 intent.putExtra("selected_post_item",item);
                 startActivity(intent);
             }
@@ -125,8 +140,11 @@ public class ClosedAdsFragment extends Fragment implements SearchView.OnQueryTex
                 }
                 Collections.sort(new_list,PostItem.PostTimeComparator);
                 postList = new_list;
-                postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
-                adListView.setAdapter(postItemAdapter);
+                //postItemAdapter = new AdPostAdapter(context,R.layout.item_ad_post,postList);
+                //adListView.setAdapter(postItemAdapter);
+
+                gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,postList);
+                gridView.setAdapter(gridViewAdapter);
 
                 progressDialog.dismiss();
 
@@ -182,13 +200,19 @@ public class ClosedAdsFragment extends Fragment implements SearchView.OnQueryTex
                 filteredValues.remove(value);
             }
         }
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, filteredValues);
-        adListView.setAdapter(postItemAdapter);
+        //postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, filteredValues);
+        //adListView.setAdapter(postItemAdapter);
+
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,filteredValues);
+        gridView.setAdapter(gridViewAdapter);
         return false;
     }
 
     public void resetSearch(){
-        postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
-        adListView.setAdapter(postItemAdapter);
+        //postItemAdapter = new AdPostAdapter(context, R.layout.item_ad_post, postList);
+        //adListView.setAdapter(postItemAdapter);
+
+        gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,postList);
+        gridView.setAdapter(gridViewAdapter);
     }
 }
