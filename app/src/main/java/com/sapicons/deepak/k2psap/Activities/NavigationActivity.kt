@@ -3,15 +3,20 @@ package com.sapicons.deepak.k2psap.Activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActionBar
+import android.app.Activity
 import android.app.Fragment
 import android.app.PendingIntent.getActivity
+import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
@@ -25,6 +30,11 @@ import android.view.View
 import android.widget.ProgressBar
 import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.common.api.ResultCallback
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.EventListener
@@ -46,15 +56,17 @@ import kotlinx.android.synthetic.main.nav_header_navigation.*
 import kotlinx.android.synthetic.main.nav_header_navigation.view.*
 import java.util.ArrayList
 
-class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
 
     var auth: FirebaseAuth ?=null
     private var doubleBackToExit = false
     lateinit var locationManager : LocationManager
     var isPermissionAcquired = false
+    var isLocationNull = true
 
     //var categoryList: MutableList<CategoryItem> = ArrayList()
     var TAG = "NAV_ACTIVITY"
+    var REQUEST_CHECK_SETTINGS = 101
 
     companion object {
        @JvmStatic var categoryList: MutableList<CategoryItem> = ArrayList()
@@ -95,6 +107,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //startExploreFragment()
 
         content_nav_request_permission_btn.setOnClickListener({askForPermissions()})
+        content_nav_enable_location_btn.setOnClickListener({createLocationRequest()})
 
 
     }
@@ -153,7 +166,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             R.id.nav_your_posts -> {
 
-                if(isPermissionAcquired)
+                if(isPermissionAcquired && !isLocationNull)
                     startActivity(Intent(this,PostedAdsActivity::class.java))
             }
 
@@ -162,7 +175,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
 
             R.id.nav_settings -> {
-                if(isPermissionAcquired)
+                if(isPermissionAcquired && !isLocationNull)
                     startActivity(Intent(this,SettingsActivity::class.java))
 
             }
@@ -184,7 +197,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private val mOnBottomNavigationItemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener =
             BottomNavigationView.OnNavigationItemSelectedListener{ item ->
-                if(isPermissionAcquired) {
+                if(isPermissionAcquired && !isLocationNull) {
                     var fragment: Fragment? = ExploreFragment()
                     var fragTags = ""
 
@@ -246,29 +259,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
 
 
-    @SuppressLint("MissingPermission")
-    // get user location
-    fun getUserLocation(){
-        var sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        var isLocationManual = sharedPref.getBoolean("isLocationManual",false)
 
-        var userLocation = UserLocation(this)
-        if(!isLocationManual) {
-            locationManager = userLocation.locationManager
-            Log.d("NA", "LM: " + locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER))
-        }
-
-
-        /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) run {
-
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                    1)
-        } else*/
-
-
-    }
 
     private fun askForPermissions() {
         ActivityCompat.requestPermissions(this,
@@ -287,9 +278,11 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
                     //set grant access button invisible
                     content_nav_request_permission_btn.visibility = View.GONE
-                    // get the user's location
-                    getUserLocation()
-                    getCategoriesFromDatabase()
+
+
+                    // check if GPS is enabled or not, if prompt to enable gps
+                    createLocationRequest()
+
                 }
                 else{
                     // permission was denied
@@ -311,32 +304,6 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-    fun getCategoriesFromDatabase() {
-        val db = FirebaseFirestore.getInstance()
-
-        categoryList = ArrayList<CategoryItem>()
-
-        db.collection("categories")
-                .document(getLocaleCountry())
-                .collection("categories")
-                .addSnapshotListener(EventListener { value, e ->
-                    if (e != null) {
-                        Log.d(TAG, "Listen failed!", e)
-                        return@EventListener
-                    }
-                    for (doc in value!!) {
-                        val item = doc.toObject(CategoryItem::class.java)
-                        Log.d(TAG, "CATEGORIES: " + item.name)
-                        categoryList.add(item)
-                    }
-
-                    // save categories to database
-
-                    // start explore fragment after checking for location permissions
-
-                    startExploreFragment()
-                })
-    }
 
     fun setManualLocation(isLocationManual: Boolean){
         var sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -369,4 +336,129 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         })
     }
 
+    fun createLocationRequest(){
+        val locationRequest = LocationRequest().apply{
+            interval = 1000
+            fastestInterval= 5000
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+
+        val builder = LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest)
+
+        val client: SettingsClient = LocationServices.getSettingsClient(this)
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+        task.addOnSuccessListener { locationSettingsResponse ->
+            // All location settings are satisfied. The client can initialize
+            // location requests here.
+            // ...
+            getUserLocation()
+            // also starts explore fragment
+            //getCategoriesFromDatabase()
+        }
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException){
+                // Location settings are not satisfied, but this can be fixed
+                // by showing the user a dialog.
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
+                    exception.startResolutionForResult(this@NavigationActivity,
+                            REQUEST_CHECK_SETTINGS)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d(TAG,"ExceptionL :  $sendEx")
+                    // Ignore the error.
+                }
+            }
+        }
+
+    }
+
+    @SuppressLint("MissingPermission")
+    fun getUserLocation(){
+        var userLocation = UserLocation(this)
+        var loc = userLocation.locationManager
+        var location = loc.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+        Log.d(TAG, "LM: $location")
+
+        var progressDialog = ProgressDialog(this)
+        progressDialog.setMessage("Retrieving Location ...")
+        //progressDialog.show()
+
+        val handler = Handler()
+        val runnable = object: Runnable {
+            override fun run() {
+                Log.d(TAG, "Runnable is working")
+                if (location == null) {
+                    location = loc.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                    //location = loc.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    Log.d(TAG, "LM: $location")
+                    handler.postDelayed(this, 0)
+                } else {
+                    handler.removeCallbacks(this)
+                    isLocationNull = false
+                    Log.d(TAG, "LM: $location")
+                    progressDialog.dismiss()
+                    getCategoriesFromDatabase()
+
+                }
+            }
+        }
+
+        //handler.removeCallbacks(this)
+        if(userLocation.savedLocation.latitude == 0.0 && userLocation.savedLocation.longitude == 0.0) {
+            progressDialog.show()
+            handler.postDelayed(runnable, 200)
+        }else{
+            isLocationNull = false
+            Log.d(TAG, "LM: $location")
+            getCategoriesFromDatabase()
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_CHECK_SETTINGS){
+            if(resultCode == Activity.RESULT_OK){
+                content_nav_enable_location_btn.visibility = View.GONE
+                getUserLocation()
+            }else{
+                Toasty.error(this,"Location off").show()
+                content_nav_enable_location_btn.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    fun getCategoriesFromDatabase() {
+        val db = FirebaseFirestore.getInstance()
+
+        categoryList = ArrayList<CategoryItem>()
+
+        db.collection("categories")
+                .document(getLocaleCountry())
+                .collection("categories")
+                .addSnapshotListener(EventListener { value, e ->
+                    if (e != null) {
+                        Log.d(TAG, "Listen failed!", e)
+                        return@EventListener
+                    }
+                    for (doc in value!!) {
+                        val item = doc.toObject(CategoryItem::class.java)
+                        Log.d(TAG, "CATEGORIES: " + item.name)
+                        categoryList.add(item)
+                    }
+
+                   // start explore fragment after checking for location permissions
+                    startExploreFragment()
+                })
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        //askForPermissions()
+    }
 }

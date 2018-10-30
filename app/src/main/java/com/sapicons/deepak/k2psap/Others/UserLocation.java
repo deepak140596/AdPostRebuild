@@ -3,6 +3,7 @@ package com.sapicons.deepak.k2psap.Others;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -17,6 +18,15 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,16 +48,24 @@ import java.util.Map;
 public class UserLocation {
     //Activity activity;
     Context context;
+    String TAG = "USER_LOCATION";
 
-    long MIN_TIME_FRAME = 1000 * 60 * 60 ; // 1 hr
-    int MIN_DISTANCE = 1000 ; // 1000m
+    long MIN_TIME_FRAME = 1000 * 60 * 60; //
+    int MIN_DISTANCE = 1000 ; //
 
     public UserLocation(Context context) {
         //this.activity = activity;
         this.context = context;
+
     }
 
     public LocationManager getLocationManager() {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor= sharedPreferences.edit();
+
+        boolean firstTimeStarted = sharedPreferences.getBoolean("firstTimeStarted",true);
+
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Listener that responds to location updates
@@ -55,9 +73,8 @@ public class UserLocation {
             @Override
             public void onLocationChanged(Location location) {
 
-                // if location changes, update the location on device as well as on update location history on database
+                // if location changes, update the location on device
                 saveLocationToSharedPreferences(location);
-                //saveUserHistory(location);
 
             }
 
@@ -83,14 +100,24 @@ public class UserLocation {
             ActivityCompat.requestPermissions((Activity)context,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     1);
-        }else
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_FRAME,MIN_DISTANCE , locationListener);
+        }else {
+            if(firstTimeStarted){
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                editor.putBoolean("firstTimeStarted",false);
+                editor.apply();
+                editor.commit();
+            }else {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_FRAME, MIN_DISTANCE, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_FRAME, MIN_DISTANCE, locationListener);
+            }
+        }
 
         return  locationManager;
     }
 
     public void saveLocationToSharedPreferences(Location location){
-        Log.d("LOCATION","Location: "+location);
+        Log.d(TAG,"Saving Location: "+location);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor= sharedPreferences.edit();
 
@@ -101,7 +128,7 @@ public class UserLocation {
 
     }
     public void saveLocationToSharedPreferences(LatLng latLng){
-        Log.d("LOCATION","Location: "+latLng);
+        Log.d(TAG,"Saving Location: "+latLng);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor= sharedPreferences.edit();
 
@@ -117,10 +144,97 @@ public class UserLocation {
         float lat = sharedPreferences.getFloat("latitude",0);
         float lon = sharedPreferences.getFloat("longitude",0);
         Location location = new Location("SavedLocation");
+
+
         location.setLatitude(lat);
         location.setLongitude(lon);
+        Log.d(TAG,"Saved Location: "+location);
 
         return location;
+    }
+
+
+    public String getAddress(double lat, double lng) {
+
+        Log.d(TAG,"get Address for LAT: "+lat+"  LON: "+lng);
+        if(lat == 0.0 && lng == 0.0)
+            return null;
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj = addresses.get(0);
+            String add = (obj.getThoroughfare()==null) ? "" :obj.getThoroughfare()+", ";
+            //add = add + "\n" + obj.getCountryName();
+            //add = add + "\n" + obj.getCountryCode();
+            //add = add + "\n" + obj.getAdminArea();
+            //add = add + "\n" + obj.getPostalCode();
+            add = add + ((obj.getSubLocality()==null) ? "" : obj.getSubLocality()+", ");
+            add = add + ((obj.getSubAdminArea()==null) ? "" : obj.getSubAdminArea());
+            //add = add + "\n" + obj.getLocality();
+            //add = add + "\n" + obj.getSubThoroughfare();
+            //add= add+ "\n" +
+
+
+            Log.v(TAG, "Address received: " + add);
+
+            return add;
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return "";
+    }
+
+    /*
+    public void getL(){
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        googleApiClient.connect();
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5 * 1000);
+        locationRequest.setFastestInterval(2 * 1000);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        //**************************
+        builder.setAlwaysShow(true); //this is the key ingredient
+        //**************************
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(@NonNull LocationSettingsResult result) {
+                final Status status = result.getStatus();
+//                final LocationSettingsStates state = result.getLocationSettingsStates();
+
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+
+
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(
+                                    context, 1000);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        break;
+                }
+            }
+        });
     }
 
     public void saveUserHistory(Location location){
@@ -146,43 +260,5 @@ public class UserLocation {
             }
         });
     }
-
-
-    public String getAddress(double lat, double lng) {
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-            Address obj = addresses.get(0);
-            String add = (obj.getThoroughfare()==null) ? "" :obj.getThoroughfare()+", ";
-            //add = add + "\n" + obj.getCountryName();
-            //add = add + "\n" + obj.getCountryCode();
-            //add = add + "\n" + obj.getAdminArea();
-            //add = add + "\n" + obj.getPostalCode();
-            add = add + ((obj.getSubLocality()==null) ? "" : obj.getSubLocality()+", ");
-            add = add + ((obj.getSubAdminArea()==null) ? "" : obj.getSubAdminArea());
-            //add = add + "\n" + obj.getLocality();
-            //add = add + "\n" + obj.getSubThoroughfare();
-            //add= add+ "\n" +
-
-
-            Log.v("IGA", "Address" + add);
-            // Toast.makeText(this, "Address=>" + add,
-            // Toast.LENGTH_SHORT).show();
-
-            // TennisAppActivity.showDialog(add);
-            return add;
-        } catch (IOException e) {
-
-            e.printStackTrace();
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-        return "";
-    }
-
-    public String checkForNull(String s){
-        if(s==null)
-            return "";
-        else
-            return s;
-    }
+    */
 }

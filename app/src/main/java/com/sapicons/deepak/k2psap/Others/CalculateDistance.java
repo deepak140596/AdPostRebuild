@@ -15,12 +15,15 @@ import android.util.Log;
  */
 
 public class CalculateDistance {
-    String TAG = "CALC_DIST";
+    String TAG = "CALCULATE_DISTANCE";
     float MAX_RADIUS = 50.0f;
     Context context;
+
     public CalculateDistance(Context context) {
         this.context = context;
     }
+
+
     public double distanceInKM(double lat1, double long1){
 
         // get location from shared preference by default
@@ -56,8 +59,8 @@ public class CalculateDistance {
         location2.setLongitude(long2);
         location2.setLatitude(lat2);
 
-        Log.d(TAG,"LOC1: "+location1);
-        Log.d(TAG,"LOC2: "+location2);
+        //Log.d(TAG,"LOC1: "+location1);
+        //Log.d(TAG,"LOC2: "+location2);
 
         double distanceInKMeters = location1.distanceTo(location2) / 1000.0;
 
@@ -77,11 +80,11 @@ public class CalculateDistance {
 
         // get distance from SharedPreferences
         //
-        float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance",10.0f);
+        float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance",20.0f);
         radius *= 10;
         radius  = (float)Math.ceil(radius);
         radius *= 10;
-        Log.d(TAG,"Radius: "+radius);
+        //Log.d(TAG,"Radius: "+radius);
         return radius;
     }
 

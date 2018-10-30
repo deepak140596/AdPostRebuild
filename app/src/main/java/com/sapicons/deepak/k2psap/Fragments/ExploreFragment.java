@@ -155,6 +155,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         //getCategoriesFromDatabase();
         initialiseViews(view);
         setOnClickListeners();
+
         setAddress();
         listenToChanges(false);
     }
@@ -344,7 +345,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         double distanceInKMeters = calculateDistance.distanceInKM(lat1,long1);
 
-        Log.d("EXP_FRAG","Distance: "+distanceInKMeters);
+        //Log.d("EXP_FRAG","Distance: "+distanceInKMeters);
 
         return calculateDistance.isNearby(distanceInKMeters);
     }
@@ -551,7 +552,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         if(progressDialog.isShowing())
             progressDialog.dismiss();
 
-        //listenToChanges(true);
+        listenToChanges(true);
+
         super.onResume();
     }
 
@@ -585,8 +587,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 String toastMsg = String.format("Place: %s", place.getName());
                 Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
 
-                listenToChanges(true);
                 setAddress();
+                listenToChanges(true);
+
             }
         }
     }
@@ -601,6 +604,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     private void setAddress(){
         UserLocation userLocation = new UserLocation(context);
         Location location = userLocation.getSavedLocation();
+
         String address = userLocation.getAddress(location.getLatitude(),location.getLongitude());
         selectedLocationTv.setText(address);
     }

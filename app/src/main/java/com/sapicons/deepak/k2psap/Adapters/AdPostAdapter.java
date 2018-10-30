@@ -194,7 +194,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
                         holder.unfavBtn.setVisibility(View.VISIBLE);
                     }else{
                         //no such doc exits
-                        Log.d(TAG,"No such doc exits!");
+                        //Log.d(TAG,"No such doc exits!");
                         holder.unfavBtn.setVisibility(View.GONE);
                         holder.favBtn.setVisibility(View.VISIBLE);
                     }
