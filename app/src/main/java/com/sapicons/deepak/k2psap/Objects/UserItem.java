@@ -11,7 +11,7 @@ public class UserItem implements Serializable {
 
     public UserItem(){}
 
-    public UserItem(String name, String email, String tokenId, String phoneNumber, String picUrl){
+    public UserItem(String name, String email, String tokenId, String phoneNumber,String picUrl){
         this.name = name;
         this.email = email;
         this.tokenId = tokenId;

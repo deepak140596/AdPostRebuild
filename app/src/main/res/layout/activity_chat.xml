@@ -11,9 +11,17 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/activity_chat_text_compose_rl"
+        android:layout_above="@+id/activity_chat_send_notification_btn"
         android:stackFromBottom="true"
         android:id="@+id/chat_activity_listview"/>
+
+    <Button
+        android:id="@+id/activity_chat_send_notification_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="Send Notification"
+        android:layout_above="@id/activity_chat_text_compose_rl"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

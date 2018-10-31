@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -180,6 +182,17 @@ public class ProfileView extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG,"Update to DB failed: "+e);
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ProfileView.this);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putBoolean("is_custom_profile_pic",true);
+                    editor.apply();
+                    editor.commit();
+                }
             }
         });
     }

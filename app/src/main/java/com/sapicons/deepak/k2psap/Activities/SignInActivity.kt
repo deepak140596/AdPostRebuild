@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.sapicons.deepak.k2psap.FirebaseInstanceIdService
 import com.sapicons.deepak.k2psap.Objects.User
+import com.sapicons.deepak.k2psap.Objects.UserItem
 import es.dmoral.toasty.Toasty
 import java.util.*
 
@@ -82,19 +83,30 @@ class SignInActivity : AppCompatActivity() {
 
 
 private fun uploadUserInformation( user: FirebaseUser? = null){
+
     if(user != null){
-        var name: String? = user.displayName
-        var email: String? = user.email
-        var picUrl : String = user.photoUrl.toString()
-        var tokenId: String = FirebaseInstanceId.getInstance().id
+        //val token = FirebaseInstanceId.getInstance().getToken()
 
-        val newUser = User(name,email,tokenId,"",picUrl)
+        //user!!.getIdToken(true).addOnSuccessListener {
+
+            //val tokenId = it.token
+            val tokenId = FirebaseInstanceId.getInstance().getToken()
+            Log.d("SIGN_IN", "tokenID: $tokenId")
+
+            var name: String? = user.displayName
+            var email: String? = user.email
+            var picUrl : String = user.photoUrl.toString()
+            //var tokenId: String = FirebaseInstanceId.getInstance().id
+
+            val newUser = UserItem(name,email,tokenId,"",picUrl)
 
 
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users").document(email.toString())
+            val db = FirebaseFirestore.getInstance()
+            val userRef = db.collection("users").document(email.toString())
 
-        userRef.set(newUser).addOnFailureListener(OnFailureListener { Log.d("SignIn","error uploading user info") })
+            userRef.set(newUser).addOnFailureListener(OnFailureListener { Log.d("SignIn","error uploading user info") })
+        //}
+
 
     }
 

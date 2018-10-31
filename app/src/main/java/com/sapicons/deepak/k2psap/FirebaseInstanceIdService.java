@@ -1,5 +1,7 @@
 package com.sapicons.deepak.k2psap;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -23,6 +25,7 @@ public class FirebaseInstanceIdService extends FirebaseMessagingService {
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
         sendRegistrationToServer(token);
+        //saveTokenToSharedPreferences(token);
     }
 
     private void sendRegistrationToServer(String token){
@@ -41,4 +44,16 @@ public class FirebaseInstanceIdService extends FirebaseMessagingService {
             });
         }
     }
+
+    private void saveTokenToSharedPreferences(String token){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor  editor= sharedPreferences.edit();
+
+        editor.putString("fcm_token",token);
+        editor.apply();
+        editor.commit();
+
+    }
+
+
 }
