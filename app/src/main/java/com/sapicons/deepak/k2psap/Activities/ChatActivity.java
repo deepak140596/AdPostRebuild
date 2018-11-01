@@ -47,7 +47,6 @@ public class ChatActivity extends AppCompatActivity {
     ListView listView;
     EditText composeText;
     FancyButton sendBtn;
-    Button sendNotificatinBtn;
     FirebaseUser user;
 
     ChatItem chatItem;
@@ -91,7 +90,6 @@ public class ChatActivity extends AppCompatActivity {
         listView = findViewById(R.id.chat_activity_listview);
         composeText = findViewById(R.id.chat_activity_compose_text_et);
         sendBtn = findViewById(R.id.chat_activity_send_btn);
-        sendNotificatinBtn = findViewById(R.id.activity_chat_send_notification_btn);
         sendBtn.setEnabled(false);
 
         list = new ArrayList<>();
@@ -133,18 +131,13 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        sendNotificatinBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendNotification();
-            }
-        });
+
 
 
 
     }
 
-    public void addMessageToDatabase(String msg){
+    public void addMessageToDatabase(final String msg){
         //String msg = composeText.getText().toString();
         final String msgId = Calendar.getInstance().getTimeInMillis()+"";
 
@@ -160,6 +153,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG,"Successfully added message.");
+                sendNotification(msg);
                 addLatestTimestampInChats(msgId);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -241,13 +235,13 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    public void sendNotification(){
+    public void sendNotification(String msg){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference collectionReference  = db.collection("users").document(toUserName)
                 .collection("notification");
 
         NotificationItem newNotification = new NotificationItem(toUserItem.getTokenId(),
-                composeText.getText().toString(),user.getDisplayName());
+                msg,user.getDisplayName());
 
         collectionReference.add(newNotification).addOnFailureListener(new OnFailureListener() {
             @Override

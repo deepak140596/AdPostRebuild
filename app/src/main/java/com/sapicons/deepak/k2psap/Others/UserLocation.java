@@ -103,7 +103,7 @@ public class UserLocation {
         }else {
             if(firstTimeStarted){
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 editor.putBoolean("firstTimeStarted",false);
                 editor.apply();
                 editor.commit();

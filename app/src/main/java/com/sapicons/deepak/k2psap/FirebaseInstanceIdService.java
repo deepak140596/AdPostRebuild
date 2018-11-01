@@ -45,7 +45,7 @@ public class FirebaseInstanceIdService extends FirebaseMessagingService {
         }
     }
 
-    private void saveTokenToSharedPreferences(String token){
+    /*private void saveTokenToSharedPreferences(String token){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor  editor= sharedPreferences.edit();
 
@@ -53,7 +53,7 @@ public class FirebaseInstanceIdService extends FirebaseMessagingService {
         editor.apply();
         editor.commit();
 
-    }
+    }*/
 
 
 }
