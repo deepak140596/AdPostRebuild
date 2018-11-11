@@ -43,8 +43,9 @@ public class YourAdsActivity extends AppCompatActivity implements SearchView.OnQ
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle("Your Ads");
+        setTitle("Your Posts");
         setContentView(R.layout.activity_your_ads);
+        getSupportActionBar().setElevation(0);
 
         initialiseViews();
         listenToChanges();

@@ -20,8 +20,9 @@ public class PostedAdsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle("Your Ads");
+        setTitle("Your Posts");
         setContentView(R.layout.activity_posted_ads);
+        getSupportActionBar().setElevation(0);
 
 
         ViewPager vp_pages= findViewById(R.id.posted_ads_vp_pages);

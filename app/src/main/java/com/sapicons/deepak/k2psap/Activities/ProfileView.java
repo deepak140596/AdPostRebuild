@@ -71,6 +71,7 @@ public class ProfileView extends AppCompatActivity {
 
         setTitle("Profile");
         Log.d(TAG,"UserProfileActivity");
+        getSupportActionBar().setElevation(0);
 
         getUserAccount();
         initialiseViews();
@@ -105,12 +106,13 @@ public class ProfileView extends AppCompatActivity {
         nameTv.setText(user.getDisplayName());
         emailTv.setText(user.getEmail());
         Log.d(TAG,"Phone Num: "+user.getPhoneNumber());
-        if((user.getPhoneNumber() == null ) || (user.getPhoneNumber()+"").length()>0){
-            phoneTv.setText(user.getPhoneNumber());
-            addPhoneBtn.setVisibility(View.GONE);
-        }else{
+        if((user.getPhoneNumber() == null ) || (user.getPhoneNumber()+"").length()==0){
             phoneTv.setText("Add Phone Number");
             addPhoneBtn.setVisibility(View.VISIBLE);
+        }else{
+
+            phoneTv.setText(user.getPhoneNumber());
+            addPhoneBtn.setVisibility(View.GONE);
         }
 
         Log.d("USER","picUrl: "+user.getPhotoUrl());
@@ -137,6 +139,13 @@ public class ProfileView extends AppCompatActivity {
                 showDialogToEnterPhoneNumber();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getUserAccount();
+        setViews();
     }
 
     private void uploadUserProfilePicToDB(){

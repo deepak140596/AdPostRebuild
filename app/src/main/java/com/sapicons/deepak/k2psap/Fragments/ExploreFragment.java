@@ -290,7 +290,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         List<PostItem> new_list = new ArrayList<>();
                         for (QueryDocumentSnapshot doc : value) {
                             PostItem newItem = doc.toObject(PostItem.class);
-                            Log.d("EXPL_FRAG", "Post: " + newItem.getTitle());
+                            //Log.d("EXPL_FRAG", "Post: " + newItem.getTitle());
                             if (isNearby(newItem))  // filter according to distance
                                 new_list.add(newItem);
 
@@ -552,7 +552,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         if(progressDialog.isShowing())
             progressDialog.dismiss();
 
-        listenToChanges(true);
+        //listenToChanges(true);
 
         super.onResume();
     }

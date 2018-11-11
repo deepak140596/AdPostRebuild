@@ -74,7 +74,7 @@ public class AdPreviewActivity extends AppCompatActivity {
     ViewPager viewPager;
     ImageView emptyViewPagerIv, postUserIv;
     TextView titleTv, datePostedTv, descriptionTv, priceTv;
-    TextView distanceTv, categoryTv, swipeInstructionTv, closedAdInstructionTv;
+    TextView distanceTv, categoryTv,  closedAdInstructionTv;
     TextView postUserNameTv, locationNameTv, relativeTimeTv;
     FancyButton callBtn, messageBtn,closeBtn;
     LinearLayout contactLL;
@@ -143,7 +143,6 @@ public class AdPreviewActivity extends AppCompatActivity {
         closeRl = findViewById(R.id.ad_preview_close_post_rl);
         addRemFavBtn = findViewById(R.id.ad_preview_set_rem_fav_fab);
 
-        swipeInstructionTv = findViewById(R.id.ad_preview_swipe_instruction_tv);
         postUserIv = findViewById(R.id.ad_preview_user_iv);
         postUserNameTv = findViewById(R.id.ad_preview_user_name_tv);
         locationNameTv = findViewById(R.id.ad_preview_location_name_tv);
@@ -306,11 +305,11 @@ public class AdPreviewActivity extends AppCompatActivity {
 
 
         PhotoPreviewPagerAdapter adapter = new PhotoPreviewPagerAdapter(this,list);
+        viewPager.setClipToPadding(false);
+        viewPager.setPadding(50,16,60,0);
+        viewPager.setPageMargin(16);
         viewPager.setAdapter(adapter);
         NUM_PAGES = list.size();
-        if(NUM_PAGES < 2)
-            swipeInstructionTv.setVisibility(View.GONE);
-        else swipeInstructionTv.setVisibility(View.VISIBLE);
 
         //setUpSlideShow();
     }

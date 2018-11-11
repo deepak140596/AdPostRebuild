@@ -1,32 +1,28 @@
-<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:card_view="http://schemas.android.com/tools">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/color_graylight"
-        android:orientation="vertical">
+    android:background="@color/color_graylight"
+    android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp">
+            android:layout_height="wrap_content">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:background="@drawable/side_nav_bar"
+                android:background="@color/colorPrimary"
                 android:orientation="vertical"
                 android:id="@+id/linearLayout">
 
                 <RelativeLayout
-                    android:layout_width="90dp"
-                    android:layout_height="90dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
                     android:layout_gravity="center_horizontal">
                     <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="90dp"
-                        android:layout_height="90dp"
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
                         android:layout_marginTop="16dp"
                         android:src="@drawable/placeholder_profile"
                         android:layout_gravity="center_horizontal"
@@ -43,9 +39,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
                     android:text="Ninja Cat"
                     android:textColor="#ffffff"
-                    android:textSize="21sp"
+                    android:textSize="18sp"
                     android:id="@+id/user_profile_name_tv"/>
             </LinearLayout>
 
@@ -55,7 +52,8 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="38dp"
-                android:elevation="5dp">
+                android:elevation="5dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -207,5 +205,3 @@
 
 
     </LinearLayout>
-
-</ScrollView>

@@ -28,14 +28,7 @@
                 android:id="@+id/ad_preview_empty_view_pager_iv"/>
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/ad_preview_swipe_instruction_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:text="@string/swipe_instruction"/>
+
     </LinearLayout>
 
     <include layout= "@layout/bottom_sheet_for_ad_preview" />

@@ -80,7 +80,7 @@ public class CalculateDistance {
 
         // get distance from SharedPreferences
         //
-        float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance",20.0f);
+        float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance",0.2f);
         radius *= 10;
         radius  = (float)Math.ceil(radius);
         radius *= 10;
