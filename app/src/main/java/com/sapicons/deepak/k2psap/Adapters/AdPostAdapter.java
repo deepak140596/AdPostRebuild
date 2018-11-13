@@ -129,7 +129,7 @@ public class AdPostAdapter extends ArrayAdapter<PostItem> {
         else
             holder.coverIv.setImageResource(R.mipmap.ic_android_icon);
 
-        if(postItem.getPostUserPicUrl() !=null)
+        if(postItem.getPostUserPicUrl() !=null && postItem.getPostUserPicUrl().length()>0)
             Glide.with(context).load(postItem.getPostUserPicUrl()).into(holder.userPostedPicIv);
         else
             holder.userPostedPicIv.setImageResource(R.drawable.placeholder_profile);

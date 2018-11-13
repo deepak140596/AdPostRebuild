@@ -13,7 +13,9 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/activity_chat_text_compose_rl"
         android:stackFromBottom="true"
-        android:id="@+id/chat_activity_listview"/>
+        android:id="@+id/chat_activity_listview"
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
 
 
     <RelativeLayout

@@ -602,8 +602,12 @@ public class PostFragment extends Fragment {
             }
 
 
+        String userPhotoUrl = "";
+        if(user.getPhotoUrl() != null)
+            userPhotoUrl = user.getPhotoUrl().toString();
+
         PostItem postItem = new PostItem(postId,email,title,description,
-                category,categoryName,user.getDisplayName(),user.getPhotoUrl().toString());
+                category,categoryName,user.getDisplayName(),userPhotoUrl);
 
         postItem.setPhoneNumber(phoneNumber);
         postItem.setLatitude(latitude);

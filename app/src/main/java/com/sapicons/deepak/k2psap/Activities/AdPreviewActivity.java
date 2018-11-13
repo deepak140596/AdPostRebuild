@@ -191,8 +191,10 @@ public class AdPreviewActivity extends AppCompatActivity {
         if(postItem.getPostUserName()!=null)
             postUserNameTv.setText(postItem.getPostUserName());
         // setup post user image
-        if(postItem.getPostUserPicUrl()!=null)
+        if(postItem.getPostUserPicUrl()!=null && postItem.getPostUserPicUrl().length()>0)
             Glide.with(this).load(postItem.getPostUserPicUrl()).into(postUserIv);
+        else
+            Glide.with(this).load(R.drawable.placeholder_profile).into(postUserIv);
 
         // setup location name
         setupLocationName();

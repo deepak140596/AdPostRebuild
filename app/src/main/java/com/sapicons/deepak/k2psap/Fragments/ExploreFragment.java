@@ -1,6 +1,8 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -14,6 +16,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -229,6 +232,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 Log.d(TAG,"PI: "+item.getTitle());
                 intent.putExtra("selected_post_item", item);
                 startActivity(intent);
+
             }
         });
 
@@ -620,13 +624,30 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 Log.d(TAG,"Scroll Up");
 
                 filterAndLocationLL.setVisibility(View.VISIBLE);
+                filterAndLocationLL.setAlpha(0.0f);
+
+                // start animation
+                filterAndLocationLL.animate()
+                        .translationY(0)
+                        .alpha(1.0f)
+                        .setListener(null);
             }
 
             @Override
             public void onScrollDown() {
 
                 Log.d(TAG,"Scroll Down");
-                filterAndLocationLL.setVisibility(View.GONE);
+                //filterAndLocationLL.setVisibility(View.GONE);
+                filterAndLocationLL.animate()
+                        .translationY(0)
+                        .alpha(0.0f)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                filterAndLocationLL.setVisibility(View.GONE);
+                            }
+                        });
             }
         });
 
