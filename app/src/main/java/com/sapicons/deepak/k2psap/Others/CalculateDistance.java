@@ -10,13 +10,15 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.sapicons.deepak.k2psap.R;
+
 /**
  * Created by Deepak Prasad on 04-10-2018.
  */
 
 public class CalculateDistance {
     String TAG = "CALCULATE_DISTANCE";
-    float MAX_RADIUS = 50.0f;
+    float MAX_RADIUS = 500.0f;
     Context context;
 
     public CalculateDistance(Context context) {
@@ -78,14 +80,20 @@ public class CalculateDistance {
 
     public double getRadiusInKM(){
 
-        // get distance from SharedPreferences
-        //
-        float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance",0.2f);
-        radius *= 10;
-        radius  = (float)Math.ceil(radius);
-        radius *= 10;
-        //Log.d(TAG,"Radius: "+radius);
-        return radius;
+        // if show all ads is preferred by user, show all the ads in a range of MAX_RADIUS
+        // else show all the ads preferred by the user by choice of his distance
+
+        boolean showAllAds = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.show_all_ads_key),false);
+        if(showAllAds)
+            return MAX_RADIUS;
+        else {
+            float radius = PreferenceManager.getDefaultSharedPreferences(context).getFloat("range_distance", 0.2f);
+            radius *= 10;
+            radius = (float) Math.ceil(radius);
+            radius *= 10;
+            //Log.d(TAG,"Radius: "+radius);
+            return radius;
+        }
     }
 
 

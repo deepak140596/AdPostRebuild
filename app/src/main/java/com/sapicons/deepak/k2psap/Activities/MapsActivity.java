@@ -10,12 +10,14 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sapicons.deepak.k2psap.Objects.User;
 import com.sapicons.deepak.k2psap.Others.UserLocation;
@@ -23,45 +25,31 @@ import com.sapicons.deepak.k2psap.R;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
-public class MapsActivity extends FragmentActivity //implements OnMapReadyCallback {
-{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
 
     private GoogleMap mMap;
-    private FancyButton saveLocationBtn;
 
     String TAG = "MAPS_ACTIVITY";
 
-    int PLACE_PICKER_REQUEST = 1;
+
+    LatLng postCoordinates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_maps);
+
+        Intent intent = getIntent();
+        float latitude = intent.getFloatExtra("latitude",0);
+        float longitude = intent.getFloatExtra("longitude",0);
+        postCoordinates = new LatLng(latitude,longitude);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);*/
+        mapFragment.getMapAsync(this);
 
-        createPlacePicker();
-
-
-
-    }
-
-
-    public void createPlacePicker(){
-
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-
-
-        try {
-            Log.d(TAG,"opening startActivityforResult");
-            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -73,50 +61,20 @@ public class MapsActivity extends FragmentActivity //implements OnMapReadyCallba
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    /*
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Marker marker=null;
 
         // Add a marker in Sydney and move the camera
-        LatLng position = new LatLng(savedLocation.getLatitude(),savedLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(position).title("Your location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-    }
-    */
-
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-
-                Place place = PlacePicker.getPlace(data, this);
-                LatLng latLng = place.getLatLng();
-                Log.d(TAG,"LatLng: "+latLng);
-                saveLocation(latLng);
-                String toastMsg = String.format("Place: %s", place.getName());
-                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private void saveLocation(LatLng latLng){
-
-        UserLocation userLocation = new UserLocation(this);
-        userLocation.saveLocationToSharedPreferences(latLng);
-
-        /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        float lat = (float)latLng.latitude;
-        float lon = (float)latLng.longitude;
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat("latitude",lat);
-        editor.putFloat("longitude",lon);
-        editor.putBoolean("isLocationManual",true);
-        editor.apply();
-        editor.commit();
-
-        finish();*/
+        LatLng position = postCoordinates;
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 15);
+        mMap.animateCamera(cameraUpdate);
+        if(marker != null)
+            marker.remove();
+        mMap.addMarker(new MarkerOptions().position(position));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
 

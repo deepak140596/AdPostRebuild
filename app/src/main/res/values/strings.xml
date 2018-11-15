@@ -149,4 +149,10 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="show_all_ads_key">key_show_all_ads</string>
+    <string name="show_all_ads_title">Show all Ads</string>
+    <string name="show_all_ads_summary_on">Showing all Ads</string>
+    <string name="show_all_ads_summary_off">Showing Ads nearby</string>
+
+    <string name="string_share_text">Now get easy access to stationery products nearby you. Download the app now!\n</string>
 </resources>

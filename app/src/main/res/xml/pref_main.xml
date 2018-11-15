@@ -4,6 +4,13 @@
     <PreferenceCategory android:title="General">
 
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/show_all_ads_key"
+            android:title="@string/show_all_ads_title"
+            android:summaryOn="@string/show_all_ads_summary_on"
+            android:summaryOff="@string/show_all_ads_summary_off"/>
+
         <net.jayschwa.android.preference.SliderPreference
             android:key="range_distance"
             android:title="@string/slider_title"
@@ -11,12 +18,6 @@
             android:defaultValue="@string/slider_default"
             android:dialogMessage="@string/slider_message" />
 
-
-        <!--
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="@string/key_show_total_due"
-            android:title="@string/show_total_due" />-->
 
     </PreferenceCategory>
 

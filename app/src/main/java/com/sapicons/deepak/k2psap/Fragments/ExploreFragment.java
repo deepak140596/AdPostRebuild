@@ -23,6 +23,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -60,7 +61,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.sapicons.deepak.k2psap.Activities.AdPreviewActivity;
-import com.sapicons.deepak.k2psap.Activities.MapsActivity;
 import com.sapicons.deepak.k2psap.Activities.NavigationActivity;
 import com.sapicons.deepak.k2psap.Adapters.AdPostAdapter;
 import com.sapicons.deepak.k2psap.Adapters.AdPostGridViewAdapter;
@@ -90,7 +90,8 @@ import static android.app.Activity.RESULT_OK;
  * Created by Deepak Prasad on 29-09-2018.
  */
 
-public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+public class ExploreFragment extends Fragment implements SearchView.OnQueryTextListener,
+        MenuItem.OnActionExpandListener, SwipeRefreshLayout.OnRefreshListener {
     String TAG = "EXP_FRAG";
 
     ListView adListView;
@@ -107,6 +108,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     AdPostGridViewAdapter gridViewAdapter;
     //RecyclerView.Adapter postItemRAdapter;
     //RecyclerView.LayoutManager mLayoutManager;
+
+    SwipeRefreshLayout swipeRefreshLayout;
+
     Context context;
 
 
@@ -200,9 +204,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         gridView.setAdapter(gridViewAdapter);
         gridView.setEmptyView(emptyLL);
 
-
-
-
+        // SWIPE REFRESH LAYOUT
+        swipeRefreshLayout = view.findViewById(R.id.frag_explore_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
     }
 
@@ -323,6 +327,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                         gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,nearbyPostList);
                         gridView.setAdapter(gridViewAdapter);
 
+                        if(swipeRefreshLayout.isRefreshing()){
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
 
                     }
                 });
@@ -366,6 +373,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.collapsed_search_menu,menu);
         //inflater.inflate(R.menu.sort_by_type_menu,menu);
+        inflater.inflate(R.menu.menu_refresh,menu);
 
         MenuItem sortItem = menu.findItem(R.id.action_sort);
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -390,6 +398,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
             PopupWindow popupWindow = popupCategories();
             popupWindow.showAtLocation(mostRecentViewPager, Gravity.CENTER,0,0);
         }*/
+
+        if(itemId == R.id.action_refresh){
+            onRefresh();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -652,5 +664,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         });
 
 
+    }
+
+    @Override
+    public void onRefresh() {
+        listenToChanges(true);
     }
 }

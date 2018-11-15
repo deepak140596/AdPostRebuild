@@ -64,6 +64,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import at.markushi.ui.CircleButton;
 import es.dmoral.toasty.Toasty;
 import mehdi.sakout.fancybuttons.FancyButton;
 
@@ -76,9 +77,10 @@ public class AdPreviewActivity extends AppCompatActivity {
     TextView titleTv, datePostedTv, descriptionTv, priceTv;
     TextView distanceTv, categoryTv,  closedAdInstructionTv;
     TextView postUserNameTv, locationNameTv, relativeTimeTv;
-    FancyButton callBtn, messageBtn,closeBtn;
+    FancyButton closeBtn;
+    CircleButton callBtn, messageBtn;
     LinearLayout contactLL;
-    RelativeLayout closeRl;
+    RelativeLayout closeRl,locationAddressRl;
     FloatingActionButton addRemFavBtn;
 
     PopupWindow popupWindow;
@@ -111,8 +113,11 @@ public class AdPreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ad_preview);
 
+
         postItem = (PostItem)getIntent().getSerializableExtra("selected_post_item");
         //isFavFrag = getIntent().getBooleanExtra("is_fav_frag",true);
+
+        setTitle(postItem.getTitle());
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -151,12 +156,9 @@ public class AdPreviewActivity extends AppCompatActivity {
         relativeTimeTv = findViewById(R.id.ad_preview_relative_time_tv);
 
         bottomSheet = findViewById(R.id.bottom_sheet_rl);
-
-
-
+        locationAddressRl = findViewById(R.id.bottom_sheet_location_address_rl);
 
         progressDialog = new ProgressDialog(this);
-
 
     }
     public void setupViews(){
@@ -242,6 +244,15 @@ public class AdPreviewActivity extends AppCompatActivity {
         });
 
 
+        locationAddressRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdPreviewActivity.this, MapsActivity.class);
+                intent.putExtra("latitude",postItem.getLatitude());
+                intent.putExtra("longitude",postItem.getLongitude());
+                startActivity(intent);
+            }
+        });
     }
 
     public void setupBottomSheet(){

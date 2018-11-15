@@ -13,6 +13,7 @@ import android.content.IntentSender
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
@@ -46,6 +47,7 @@ import com.sapicons.deepak.k2psap.Fragments.ExploreFragment
 import com.sapicons.deepak.k2psap.Fragments.FavoritesFragment
 import com.sapicons.deepak.k2psap.Fragments.PostFragment
 import com.sapicons.deepak.k2psap.Objects.CategoryItem
+import com.sapicons.deepak.k2psap.Others.RateUs
 import com.sapicons.deepak.k2psap.Others.UserLocation
 import com.sapicons.deepak.k2psap.R
 import es.dmoral.toasty.Toasty
@@ -180,9 +182,15 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             }
             R.id.nav_share -> {
+                val i = Intent(android.content.Intent.ACTION_SEND)
+                i.type = "text/plain"
+                i.putExtra(android.content.Intent.EXTRA_SUBJECT, "Take a look at this app!")
+                i.putExtra(android.content.Intent.EXTRA_TEXT, getString(R.string.string_share_text) + applicationContext.packageName)
+                startActivity(Intent.createChooser(i, "Share via"))
             }
-            R.id.nav_send -> {
-
+            R.id.nav_rate_us -> {
+                val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + applicationContext.packageName))
+                startActivity(rateIntent)
             }
             R.id.nav_log_out -> {
                 signOutUser()
@@ -234,6 +242,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         var fragment = ExploreFragment()
         var fragmentManager = fragmentManager
         fragmentManager.beginTransaction().replace(R.id.navigation_activity_content_frame,fragment,"").commit()
+        RateUs.app_launched(this)
 
     }
 
