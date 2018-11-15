@@ -133,19 +133,20 @@ public class RateUs {
                                 }).setPositiveButton("Send", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                        CollectionReference feedbacks= FirebaseFirestore.getInstance().collection("feedbacks");
-                                        String feedback_body=body.getText().toString();
                                         String postId = System.currentTimeMillis()+"";
+                                        DocumentReference feedbacks= FirebaseFirestore.getInstance().
+                                                collection("feedbacks").document(postId);
+                                        String feedback_body=body.getText().toString();
                                         FeedbackItem item=new FeedbackItem(postId,feedback_body);
 
-                                        feedbacks.add(item).addOnFailureListener(new OnFailureListener() {
+                                        feedbacks.set(item).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 Log.d("RATE_US","Failed to send feedback. Error: "+e);
                                             }
-                                        }).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        }).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                            public void onComplete(@NonNull Task<Void> task) {
                                                 if (editor != null) {
                                                     editor.putBoolean("dontshowagain", true);
                                                     editor.commit();
