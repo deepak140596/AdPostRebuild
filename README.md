@@ -1,4 +1,4 @@
-K2PB   (Documentation)
+Book Xtore  (Documentation)
 ======================
 
 An Android App that helps users (primarily students) to search for books and stationeries (new or old) nearby their location.
