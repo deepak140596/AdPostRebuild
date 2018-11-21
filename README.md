@@ -25,12 +25,12 @@ Method 2:
 1.	Open Android Studio/Eclipse.
 2.	Select New Project.
 3.	Choose from VCS/Github.
-4.	Enter the URL : www.github.com/deepak140596/k2pb
+4.	Enter the URL : www.github.com/deepak140596/AdPostRebuild
 
 Contribute
 ------------
--	Issue Tracker: github.com/deepak140596/k2pb/issues
--	Source Code:  github.com/deepak140596/k2pb
+-	Issue Tracker: github.com/deepak140596/AdPostRebuild/issues
+-	Source Code:  github.com/deepak140596/AdPostRebuild
 
 Support
 ----------
