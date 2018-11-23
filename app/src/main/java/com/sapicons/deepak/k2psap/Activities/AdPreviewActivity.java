@@ -3,6 +3,7 @@ package com.sapicons.deepak.k2psap.Activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.icu.text.NumberFormat;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -518,22 +519,6 @@ public class AdPreviewActivity extends AppCompatActivity {
         locationNameTv.setText(address);
     }
 
-    public static String setTradeType(PostItem postItem){
-        String exchangeType = postItem.getExchangeType();
-
-        // TODO
-        // remove next two lines
-        if(exchangeType==null)
-            exchangeType = "Price";
-        if(exchangeType.equals("Free"))
-            return "Free";
-        else if(exchangeType.equals("Price"))
-            return postItem.getPrice();
-        else if(exchangeType.equals("Exchange"))
-            return "Exchange for "+postItem.getExchangeFor();
-
-        return "";
-    }
 
     public void changeStatusOfPost(final PostItem postItem, final String status){
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -648,5 +633,37 @@ public class AdPreviewActivity extends AppCompatActivity {
         long now = Calendar.getInstance().getTimeInMillis();
         CharSequence ago = DateUtils.getRelativeTimeSpanString(oldTime,now,DateUtils.MINUTE_IN_MILLIS);
         return ago.toString();
+    }
+
+    // UTILITY FUNCTION
+
+    public static String setTradeType(PostItem postItem){
+        String exchangeType = postItem.getExchangeType();
+
+        // TODO
+        // remove next two lines
+        if(exchangeType==null)
+            exchangeType = "Price";
+        if(exchangeType.equals("Free"))
+            return "Free";
+        else if(exchangeType.equals("Price")) {
+            if(postItem.getPrice().length() == 0)
+                return "Free";
+            Float dA = Float.parseFloat(postItem.getPrice());
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("en","in"));
+                return numberFormat.format(dA);
+            }else {
+
+                java.text.NumberFormat numberFormat = java.text.NumberFormat.getNumberInstance(Locale.US);
+                return numberFormat.format(dA);
+            }
+            //return postItem.getPrice();
+        }
+        else if(exchangeType.equals("Exchange"))
+            return "Exchange for "+postItem.getExchangeFor();
+
+        return "";
     }
 }

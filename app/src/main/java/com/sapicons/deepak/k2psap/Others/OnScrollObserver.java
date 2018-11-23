@@ -17,19 +17,18 @@ public abstract class OnScrollObserver implements AbsListView.OnScrollListener {
     }
 
     int last = 0;
-    boolean control = true;
 
     @Override
     public void onScroll(AbsListView view, int current, int visibles, int total) {
-        if (current < last && !control) {
+        int currentVisiblePos = view.getFirstVisiblePosition();
+        if (currentVisiblePos < last ) {
             onScrollUp();
-            control = true;
-        } else if (current > last && control) {
+        } else if (currentVisiblePos > last ) {
             onScrollDown();
-            control = false;
+
         }
 
-        last = current;
+        last = currentVisiblePos;
     }
 
 }

@@ -164,7 +164,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         setOnClickListeners();
 
         setAddress();
-        listenToChanges(false);
+        listenToChanges();
     }
 
     public void initialiseViews(View view) {
@@ -278,7 +278,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         });
     }
 
-    public void listenToChanges(final boolean isMapActivityClosed) {
+    public void listenToChanges() {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //final CollectionReference docRef = db.collection("users").document(user.getEmail()).collection("");
@@ -400,6 +400,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         }*/
 
         if(itemId == R.id.action_refresh){
+            swipeRefreshLayout.setRefreshing(true);
             onRefresh();
         }
         return super.onOptionsItemSelected(item);
@@ -459,6 +460,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         if(category == null || category.trim().isEmpty()){
             return ;
         }
+        if(category.equals("Remove Filters") ) {
+            listenToChanges();
+            return;
+        }
 
         selectedCategoryPostList = new ArrayList<>(nearbyPostList);
         for(PostItem item : nearbyPostList){
@@ -489,6 +494,9 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
         gridViewAdapter = new AdPostGridViewAdapter(context,R.layout.item_ad_grid,selectedCategoryPostList);
         gridView.setAdapter(gridViewAdapter);
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
 
@@ -521,7 +529,10 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
 
                 //filter by category
                 filterByCategory(cateName);
-                categorySelectedTv.setText(cateName);
+                if(cateName.equals("Remove Filters"))
+                    categorySelectedTv.setText("Select Category");
+                else
+                    categorySelectedTv.setText(cateName);
 
                 popupWindow.dismiss();
             }
@@ -604,7 +615,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 Toast.makeText(context, toastMsg, Toast.LENGTH_LONG).show();
 
                 setAddress();
-                listenToChanges(true);
+                listenToChanges();
 
             }
         }
@@ -636,38 +647,25 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
                 Log.d(TAG,"Scroll Up");
 
                 filterAndLocationLL.setVisibility(View.VISIBLE);
-                filterAndLocationLL.setAlpha(0.0f);
 
-                // start animation
-                filterAndLocationLL.animate()
-                        .translationY(0)
-                        .alpha(1.0f)
-                        .setListener(null);
             }
 
             @Override
             public void onScrollDown() {
 
                 Log.d(TAG,"Scroll Down");
-                //filterAndLocationLL.setVisibility(View.GONE);
-                filterAndLocationLL.animate()
-                        .translationY(0)
-                        .alpha(0.0f)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                filterAndLocationLL.setVisibility(View.GONE);
-                            }
-                        });
+                filterAndLocationLL.setVisibility(View.GONE);
+
             }
         });
+
+
 
 
     }
 
     @Override
     public void onRefresh() {
-        listenToChanges(true);
+        resetSearch();
     }
 }
