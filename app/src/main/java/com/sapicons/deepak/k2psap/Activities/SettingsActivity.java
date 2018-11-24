@@ -61,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"deepak140596@gmail.com"});
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{context.getString(R.string.url_support)});
         intent.putExtra(Intent.EXTRA_SUBJECT, "Query from alpha app");
         intent.putExtra(Intent.EXTRA_TEXT, body);
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.choose_email_client)));

@@ -15,6 +15,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.sapicons.deepak.k2psap.FirebaseInstanceIdService
 import com.sapicons.deepak.k2psap.Objects.User
 import com.sapicons.deepak.k2psap.Objects.UserItem
+import com.sapicons.deepak.k2psap.R
 import es.dmoral.toasty.Toasty
 import java.util.*
 
@@ -41,6 +42,9 @@ class SignInActivity : AppCompatActivity() {
         startActivityForResult(AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
+                .setIsSmartLockEnabled(false)
+                .setLogo(R.drawable.book_xtore)
+                .setPrivacyPolicyUrl(this.getString(R.string.url_privacy))
                 .build(), RC_SIGN_IN)
 
     }
