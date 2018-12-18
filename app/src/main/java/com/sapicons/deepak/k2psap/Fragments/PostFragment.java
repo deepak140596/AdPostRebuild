@@ -389,8 +389,10 @@ public class PostFragment extends Fragment {
 
         // store the category names
         List<String> catName = new ArrayList<>();
-        for(CategoryItem item: list)
-            catName.add(item.getName());
+        for(CategoryItem item: list) {
+            if(!item.getName().equalsIgnoreCase("remove filters"))
+                catName.add(item.getName());
+        }
 
         // Create a default adapter for spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,catName);
@@ -858,59 +860,5 @@ public class PostFragment extends Fragment {
         selectedAddressTv.setText(address);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
 
-   /* @Override
-    public void onMapReady(GoogleMap gMap) {
-        googleMap= gMap;
-        LatLng position;
-        Log.d(TAG,"Inside Map Ready");
-        if(isLocationSetManual)
-            position = new LatLng(latitude,longitude);
-        else{
-            Location location = (new UserLocation(context)).getSavedLocation();
-            position = new LatLng(location.getLatitude(),location.getLongitude());
-        }
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 10);
-        googleMap.animateCamera(cameraUpdate);
-        if(marker != null)
-            marker.remove();
-        marker =googleMap.addMarker(new MarkerOptions().position(position).title("Your location"));
-        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //mapView.onResume();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //mapView.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        //mapView.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        //mapView.onStop();
-    }
-    */
 }

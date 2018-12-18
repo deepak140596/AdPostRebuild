@@ -469,7 +469,7 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         for(PostItem item : nearbyPostList){
             String searchString = item.getCategoryName().toLowerCase();
 
-            if(!searchString.contains(category.toLowerCase()))
+            if(!searchString.equalsIgnoreCase(category.toLowerCase()))
                 selectedCategoryPostList.remove(item);
         }
 

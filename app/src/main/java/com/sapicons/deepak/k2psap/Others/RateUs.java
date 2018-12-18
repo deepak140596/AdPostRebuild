@@ -75,7 +75,7 @@ public class RateUs {
                                       final SharedPreferences.Editor editor) {
 
         AlertDialog.Builder b=new AlertDialog.Builder(mContext);
-        b.setTitle("Enjoying K2PB?");
+        b.setTitle("Enjoying Book Xtore?");
 
         b.setPositiveButton("Yes!", new DialogInterface.OnClickListener() {
             @Override
