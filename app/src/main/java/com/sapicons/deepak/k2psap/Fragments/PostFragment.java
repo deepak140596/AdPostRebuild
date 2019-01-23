@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
@@ -129,6 +130,7 @@ public class PostFragment extends Fragment {
     StorageReference storageReference;
 
     Context context;
+    AppCompatActivity activity;
 
     String TAG ="POST_FRAG";
 
@@ -151,6 +153,7 @@ public class PostFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_post, container, false);
         context = getActivity();
+        activity = (AppCompatActivity)getActivity();
         return view;
     }
 
@@ -380,7 +383,7 @@ public class PostFragment extends Fragment {
         if(imgFiveUri != null)
             list.add(imgFiveUri);
 
-        PhotoPreviewPagerAdapter adapter = new PhotoPreviewPagerAdapter(getActivity(),list);
+        PhotoPreviewPagerAdapter adapter = new PhotoPreviewPagerAdapter(activity,list);
         viewPager.setAdapter(adapter);
     }
 

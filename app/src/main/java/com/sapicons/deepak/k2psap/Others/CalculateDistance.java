@@ -83,7 +83,7 @@ public class CalculateDistance {
         // if show all ads is preferred by user, show all the ads in a range of MAX_RADIUS
         // else show all the ads preferred by the user by choice of his distance
 
-        boolean showAllAds = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.show_all_ads_key),false);
+        boolean showAllAds = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.show_all_ads_key),true);
         if(showAllAds)
             return MAX_RADIUS;
         else {

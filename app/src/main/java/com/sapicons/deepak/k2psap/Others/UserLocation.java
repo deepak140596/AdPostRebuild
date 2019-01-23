@@ -109,7 +109,7 @@ public class UserLocation {
                 editor.commit();
             }else {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_FRAME, MIN_DISTANCE, locationListener);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_FRAME, MIN_DISTANCE, locationListener);
+                //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_FRAME, MIN_DISTANCE, locationListener);
             }
         }
 

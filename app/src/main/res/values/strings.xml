@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Book Xtore</string>
+    <string name="app_name">BooXtore</string>
     <string name="title_activity_parent">ParentActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -67,4 +67,5 @@
 
     <string name="string_share_text">Now get easy access to stationery products nearby you. Download the app now!\n</string>
     <string name="url_support">support@sapicons.com</string>
+    <string name="default_country_code">IN</string>
 </resources>

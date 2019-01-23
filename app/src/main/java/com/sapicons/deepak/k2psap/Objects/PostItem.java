@@ -16,6 +16,7 @@ public class PostItem implements Serializable {
     String status;
     String categoryName;
     String exchangeFor, exchangeType;
+    boolean verified;
 
     float latitude, longitude;
 
@@ -48,6 +49,8 @@ public class PostItem implements Serializable {
 
         this.exchangeFor = "";
         this.exchangeType="";
+
+        this.verified = false;
 
     }
 
@@ -209,6 +212,14 @@ public class PostItem implements Serializable {
 
     public void setExchangeType(String exchangeType) {
         this.exchangeType = exchangeType;
+    }
+
+    public boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 
     public static Comparator<PostItem> PostTimeComparator = new Comparator<PostItem>() {

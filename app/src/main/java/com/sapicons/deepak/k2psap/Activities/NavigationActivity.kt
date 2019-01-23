@@ -309,6 +309,9 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     fun getLocaleCountry(): String {
         var locale = this.resources.configuration.locale.country
         Log.d("LOCALE","Country: "+locale)
+
+        if(locale.isEmpty())
+            return getString(R.string.default_country_code)
         return locale
     }
 
@@ -453,6 +456,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                         Log.d(TAG, "Listen failed!", e)
                         return@EventListener
                     }
+                    categoryList = ArrayList<CategoryItem>()
                     for (doc in value!!) {
                         val item = doc.toObject(CategoryItem::class.java)
                         Log.d(TAG, "CATEGORIES: " + item.name)

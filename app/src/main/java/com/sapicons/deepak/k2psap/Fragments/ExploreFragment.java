@@ -1,31 +1,17 @@
 package com.sapicons.deepak.k2psap.Fragments;
 
-import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -283,7 +269,8 @@ public class ExploreFragment extends Fragment implements SearchView.OnQueryTextL
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //final CollectionReference docRef = db.collection("users").document(user.getEmail()).collection("");
         CollectionReference collectionReference = db.collection("ads");
-        Query query = collectionReference.whereEqualTo("status","open");
+        Query query = collectionReference.whereEqualTo("status","open")
+                .whereEqualTo("verified",true);
 
         query
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {

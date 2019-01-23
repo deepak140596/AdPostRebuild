@@ -120,7 +120,8 @@ public class ProfileView extends AppCompatActivity {
 
         if(user.getPhotoUrl()!=null){
             Glide.with(this).load(user.getPhotoUrl()).into(picIv);
-        }
+        }else
+            Glide.with(this).load(R.drawable.placeholder_profile).into(picIv);
 
         editUserPicIV.setOnClickListener(new View.OnClickListener() {
             @Override
