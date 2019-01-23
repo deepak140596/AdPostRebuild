@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
-    tools:context="com.sapicons.deepak.k2psap.Activities.ChatActivity">
+    tools:context="com.bxtore.dev.bxt.Activities.ChatActivity">
 
 
     <ListView

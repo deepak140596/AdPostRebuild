@@ -1,4 +1,4 @@
-package com.sapicons.deepak.k2psap
+package com.bxtore.dev.bxt
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

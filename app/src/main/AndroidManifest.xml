@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sapicons.deepak.k2psap">
+    package="com.bxtore.dev.bxt">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -16,7 +16,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".Activities.SignInActivity">
+        <activity android:name="com.bxtore.dev.bxt.Activities.SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,23 +24,23 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".FirebaseInstanceIdService">
+        <service android:name="com.bxtore.dev.bxt.FirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
         <activity
-            android:name=".Activities.NavigationActivity"
+            android:name="com.bxtore.dev.bxt.Activities.NavigationActivity"
             android:label="@string/title_activity_navigation"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity" />
         <activity
-            android:name=".Activities.AdPreviewActivity"
-            android:parentActivityName=".Activities.NavigationActivity" />
+            android:name="com.bxtore.dev.bxt.Activities.AdPreviewActivity"
+            android:parentActivityName="com.bxtore.dev.bxt.Activities.NavigationActivity" />
         <activity
-            android:name=".Activities.ChatActivity"
-            android:parentActivityName=".Activities.NavigationActivity" />
+            android:name="com.bxtore.dev.bxt.Activities.ChatActivity"
+            android:parentActivityName="com.bxtore.dev.bxt.Activities.NavigationActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -51,24 +51,24 @@
         -->
 
         <activity
-            android:name=".Activities.MapsActivity"
+            android:name="com.bxtore.dev.bxt.Activities.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".Activities.YourAdsActivity"
-            android:parentActivityName=".Activities.NavigationActivity" />
+            android:name="com.bxtore.dev.bxt.Activities.YourAdsActivity"
+            android:parentActivityName="com.bxtore.dev.bxt.Activities.NavigationActivity" />
         <activity
-            android:name=".Activities.SettingsActivity"
-            android:parentActivityName=".Activities.NavigationActivity">
+            android:name="com.bxtore.dev.bxt.Activities.SettingsActivity"
+            android:parentActivityName="com.bxtore.dev.bxt.Activities.NavigationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.NavigationActivity" />
+                android:value="com.bxtore.dev.bxt.Activities.NavigationActivity" />
         </activity>
         <activity
-            android:name=".Activities.ProfileView"
-            android:parentActivityName=".Activities.NavigationActivity"/>
+            android:name="com.bxtore.dev.bxt.Activities.ProfileView"
+            android:parentActivityName="com.bxtore.dev.bxt.Activities.NavigationActivity"/>
         <activity
-            android:name=".Activities.PostedAdsActivity"
-            android:parentActivityName=".Activities.NavigationActivity" />
+            android:name="com.bxtore.dev.bxt.Activities.PostedAdsActivity"
+            android:parentActivityName="com.bxtore.dev.bxt.Activities.NavigationActivity" />
     </application>
 
 </manifest>

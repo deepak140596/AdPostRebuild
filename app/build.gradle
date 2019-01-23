@@ -9,7 +9,7 @@ apply plugin: 'io.fabric'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.sapicons.deepak.k2psap"
+        applicationId "com.bxtore.dev.bxt"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 2

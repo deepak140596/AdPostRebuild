@@ -1,4 +1,4 @@
-package com.sapicons.deepak.k2psap
+package com.bxtore.dev.bxt
 
 import org.junit.Test
 
